@@ -7,3 +7,7 @@ uploads/
 *.log
 service-account*.json
 admin_users.json
+
+# Project setup / generated
+cursor_project_file_structure_setup.md
+embed_logo.py
