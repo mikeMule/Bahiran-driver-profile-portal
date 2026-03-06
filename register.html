@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motor Driver Registration</title>
+<link rel="icon" href="/assets/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-box"><img src="/assets/logo.png" alt="MotoReg Ethiopia" class="logo-img"></div>
+  <div class="header-text">
+    <h1>MotoReg Ethiopia</h1>
+    <p data-key="headerSub">Official Motor Driver Registration Portal</p>
+  </div>
+  <div class="lang-switcher">
+    <button class="lang-btn" onclick="setLang('en')" id="btnEn">
+      <span class="flag">🇺🇸</span><span class="lang-label">EN</span>
+    </button>
+    <button class="lang-btn active" onclick="setLang('am')" id="btnAm">
+      <span class="flag">🇪🇹</span><span class="lang-label">አማ</span>
+    </button>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h2><span data-key="heroTitle">Register Your <span>Motor</span><br>Driver Profile</span></h2>
+    <p data-key="heroSub">Complete all required fields to register as an official motor driver. All documents will be verified within 2–3 business days.</p>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps" style="animation: fadeUp .5s .05s ease both">
+    <div class="step active" id="step1">
+      <div class="step-dot">1</div>
+      <span data-key="step1">Personal</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2">
+      <div class="step-dot">2</div>
+      <span data-key="step2">Vehicle</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3">
+      <div class="step-dot">3</div>
+      <span data-key="step3">Documents</span>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card" id="formCard">
+  <form id="regForm" novalidate>
+
+    <!-- SECTION 1: Personal Info -->
+    <div class="section-title">
+      <div class="section-num">1</div>
+      <span data-key="sec1">Personal Information</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="field" id="f-firstname">
+        <label><span data-key="lblFirstName">First Name</span> <span class="req">*</span></label>
+        <input type="text" id="firstname" placeholder="e.g. Abebe" maxlength="50">
+        <span class="err-msg">⚠ First name is required</span>
+      </div>
+      <div class="field" id="f-lastname">
+        <label><span data-key="lblLastName">Last Name</span> <span class="req">*</span></label>
+        <input type="text" id="lastname" placeholder="e.g. Kebede" maxlength="50">
+        <span class="err-msg">⚠ Last name is required</span>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="field" id="f-phone">
+        <label><span data-key="lblPhone">Phone Number</span> <span class="req">*</span></label>
+        <div class="phone-wrap">
+          <div class="phone-prefix">+251</div>
+          <input type="tel" id="phone" placeholder="09XXXXXXXX or 07XXXXXXXX" maxlength="10" oninput="formatPhone(this)">
+        </div>
+        <span class="err-msg">⚠ Enter valid phone: 09XXXXXXXX or 07XXXXXXXX (10 digits)</span>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Vehicle Info -->
+    <div class="section-title">
+      <div class="section-num">2</div>
+      <span data-key="sec2">Vehicle Information</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="field" id="f-brand">
+        <label><span data-key="lblBrand">Motor Brand</span> <span class="req">*</span></label>
+        <select id="brand">
+          <option value="">Select brand...</option>
+          <option>Honda</option>
+          <option>Bajaj</option>
+          <option>TVS</option>
+          <option>Yamaha</option>
+          <option>Suzuki</option>
+          <option>Hero</option>
+          <option>Lifan</option>
+          <option>Haojue</option>
+          <option>Loncin</option>
+          <option>Other</option>
+        </select>
+        <span class="err-msg">⚠ Select motor brand</span>
+      </div>
+      <div class="field" id="f-year">
+        <label><span data-key="lblYear">Manufacture Year</span> <span class="req">*</span></label>
+        <select id="year">
+          <option value="">Select year...</option>
+        </select>
+        <span class="err-msg">⚠ Select manufacture year</span>
+      </div>
+    </div>
+
+    <!-- Plate Number -->
+    <div style="margin-top:14px">
+      <div class="section-title" style="margin-top:20px">
+        <div class="section-num">🔢</div>
+        <span data-key="secPlate">Plate Number</span>
+      </div>
+
+      <div class="grid-3">
+        <div class="field" id="f-platecode">
+          <label><span data-key="lblRegionCode">Region Code</span> <span class="req">*</span></label>
+          <select id="platecode" onchange="fillPlateLetterFromRegion(); updatePlate();">
+            <option value="">Code...</option>
+            <option value="1">1 — Addis Ababa</option>
+            <option value="2">2 — Oromia</option>
+            <option value="3">3 — Amhara</option>
+            <option value="4">4 — SNNPR</option>
+            <option value="5">5 — Tigray</option>
+            <option value="6">6 — Somali</option>
+            <option value="7">7 — Afar</option>
+            <option value="8">8 — Benishangul</option>
+            <option value="9">9 — Gambela</option>
+            <option value="10">10 — Harari</option>
+          </select>
+          <span class="err-msg">⚠ Select region code</span>
+        </div>
+        <div class="field" id="f-plateletter">
+          <label><span data-key="lblLetters">Letters</span> <span class="req">*</span></label>
+          <input type="text" id="plateletter" placeholder="AA" maxlength="3" readonly tabindex="-1" title="Filled from region">
+          <span class="err-msg">⚠ Enter plate letters</span>
+        </div>
+        <div class="field" id="f-platenum">
+          <label><span data-key="lblNumbers">Numbers</span> <span class="req">*</span></label>
+          <input type="text" id="platenum" placeholder="12345" maxlength="5" oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePlate()">
+          <span class="err-msg">⚠ Enter plate numbers</span>
+        </div>
+      </div>
+
+      <!-- Live plate preview -->
+      <div class="plate-preview" id="platePreview">
+        <span id="plateRegion" class="plate-region" style="display:none"></span>
+        <span id="plateFull">— — — — —</span>
+      </div>
+      <div class="plate-eth">🇪🇹 ETHIOPIA</div>
+    </div>
+
+    <!-- SECTION 3: Documents -->
+    <div class="section-title" style="margin-top:28px">
+      <div class="section-num">3</div>
+      <span data-key="sec3">Documents &amp; Files</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="field" id="f-licence">
+        <label><span data-key="lblLicence">Driving Licence</span> <span class="req">*</span></label>
+        <div class="upload-box" id="ub-licence">
+          <input type="file" id="licence" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFile(this,'ub-licence','fn-licence')">
+          <div class="upload-preview" id="preview-licence"></div>
+          <div class="upload-icon">🪪</div>
+          <div class="upload-label" data-key="upLicence">Upload Licence</div>
+          <div class="upload-sub">JPG, PNG or PDF</div>
+          <div class="upload-name" id="fn-licence"></div>
+        </div>
+        <span class="err-msg">⚠ Driving licence is required</span>
+      </div>
+      <div class="field" id="f-idcard">
+        <label><span data-key="lblId">ID Card</span> <span class="req">*</span></label>
+        <div class="upload-box" id="ub-idcard">
+          <input type="file" id="idcard" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFile(this,'ub-idcard','fn-idcard')">
+          <div class="upload-preview" id="preview-idcard"></div>
+          <div class="upload-icon">🪪</div>
+          <div class="upload-label" data-key="upId">Upload ID Card</div>
+          <div class="upload-sub">JPG, PNG or PDF</div>
+          <div class="upload-name" id="fn-idcard"></div>
+        </div>
+        <span class="err-msg">⚠ ID card is required</span>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="field" id="f-libre">
+        <label><span data-key="lblLibre">Libre / Vehicle Log Book</span> <span class="req">*</span></label>
+        <div class="upload-box" id="ub-libre">
+          <input type="file" id="libre" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFile(this,'ub-libre','fn-libre')">
+          <div class="upload-preview" id="preview-libre"></div>
+          <div class="upload-icon">📋</div>
+          <div class="upload-label" data-key="upLibre">Upload Libre Document</div>
+          <div class="upload-sub" data-key="upLibreSub">JPG, PNG or PDF — vehicle ownership document</div>
+          <div class="upload-name" id="fn-libre"></div>
+        </div>
+        <span class="err-msg">⚠ Libre document is required</span>
+      </div>
+    </div>
+
+    <!-- TERMS -->
+    <div class="section-title" style="margin-top:28px">
+      <div class="section-num">✓</div>
+      <span data-key="secTerms">Terms &amp; Conditions</span>
+    </div>
+
+    <div class="terms-box">
+      <h4 data-key="termsTitle">Motor Driver Registration Agreement</h4>
+      <p>By registering on this platform, you agree to the following terms and conditions set forth by MotoReg Ethiopia.</p>
+      <p><strong>1. Accuracy of Information:</strong> All information submitted must be accurate, complete, and truthful. Submitting false information is grounds for immediate disqualification and may result in legal action.</p>
+      <p><strong>2. Document Authenticity:</strong> All uploaded documents (Driving Licence, ID Card, Libre) must be valid, government-issued originals. Forged documents will result in permanent ban and reporting to authorities.</p>
+      <p><strong>3. Data Privacy:</strong> Your personal information will be stored securely and used only for driver verification and operational purposes. We do not share your data with third parties without consent.</p>
+      <p><strong>4. Compliance:</strong> Registered drivers must comply with all Ethiopian traffic laws and regulations at all times while on duty.</p>
+      <p><strong>5. Updates:</strong> You are responsible for keeping your profile information up to date. Expired documents must be renewed within 30 days of expiry.</p>
+      <p><strong>6. Termination:</strong> MotoReg Ethiopia reserves the right to suspend or terminate any driver account found in violation of these terms.</p>
+      <p>By checking the box below, you confirm you have read, understood, and agree to all terms above.</p>
+    </div>
+
+    <div class="field" id="f-terms">
+      <label class="checkbox-row">
+        <input type="checkbox" id="terms">
+        <span data-key="termsCheck">I have read and agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a> of MotoReg Ethiopia</span> <span class="req">*</span>
+      </label>
+      <span class="err-msg" style="margin-top:4px">⚠ You must accept the terms to continue</span>
+    </div>
+
+    <!-- SUBMIT -->
+    <button type="submit" class="submit-btn" id="submitBtn">
+      <div class="spinner" id="spinner"></div>
+      <span id="btnText" data-key="btnSubmit">Submit Registration →</span>
+    </button>
+
+  </form>
+  </div>
+
+  <!-- SUCCESS (hidden until submit succeeds) -->
+  <div id="successScreen" style="display:none">
+    <div class="success-icon">✅</div>
+    <h2 data-key="successTitle">Registration Submitted!</h2>
+    <p data-key="successMsg">Your driver profile has been received.<br>We will verify your documents within <strong>2–3 business days</strong>.<br>You will be contacted via your registered phone number.</p>
+    <div class="ref-box" id="refCode">REF-000000</div>
+    <br>
+    <button class="submit-btn" style="max-width:300px;margin:0 auto" onclick="resetForm()">
+      <span data-key="btnReset">Register Another Driver</span>
+    </button>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 MotoReg Ethiopia · <span data-key="footerRights">All rights reserved</span> · <a href="#" style="color:var(--primary);text-decoration:none" data-key="footerPrivacy">Privacy Policy</a></p>
+  </div>
+
+</div><!-- end wrapper -->
+
+<script>
+// ── Year select ──
+(function() {
+  var sel = document.getElementById('year');
+  var cur = new Date().getFullYear();
+  for (var y = cur; y >= 1990; y--) {
+    var o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    sel.appendChild(o);
+  }
+})();
+
+// ── Phone format ──
+function formatPhone(el) {
+  var v = el.value.replace(/[^0-9]/g, '');
+  if (v.indexOf('251') === 0) v = v.substring(3);
+  if (v.length > 0 && v.length <= 9 && (v[0] === '9' || v[0] === '7'))
+    v = '0' + v;
+  el.value = v.substring(0, 10);
+}
+
+// ── File upload handler (show image preview in box) ──
+function handleFile(input, boxId, nameId) {
+  var box  = document.getElementById(boxId);
+  var name = document.getElementById(nameId);
+  var previewId = 'preview-' + boxId.replace('ub-', '');
+  var previewEl = document.getElementById(previewId);
+  if (box.dataset.previewUrl) {
+    URL.revokeObjectURL(box.dataset.previewUrl);
+    delete box.dataset.previewUrl;
+  }
+  if (!input.files || !input.files[0]) {
+    box.classList.remove('has-file');
+    if (previewEl) previewEl.innerHTML = '';
+    if (name) name.textContent = '';
+    box.querySelector('.upload-icon').textContent = boxId === 'ub-libre' ? '📋' : '🪪';
+    return;
+  }
+  var f = input.files[0];
+  box.classList.add('has-file');
+  name.textContent = f.name.length > 28 ? f.name.substring(0, 25) + '...' : f.name;
+  var field = input.closest('.field');
+  if (field) field.classList.remove('has-error');
+  var isImage = /\.(jpe?g|png)$/i.test(f.name);
+  if (isImage && previewEl) {
+    var url = URL.createObjectURL(f);
+    box.dataset.previewUrl = url;
+    previewEl.innerHTML = '<img src="' + url + '" alt="">';
+    previewEl.style.display = 'block';
+  } else if (previewEl) {
+    previewEl.innerHTML = '';
+    previewEl.style.display = 'none';
+  }
+}
+
+// Region code → plate letters (Ethiopia)
+var REGION_LETTERS = { '1':'AA', '2':'OR', '3':'AM', '4':'SN', '5':'TG', '6':'SM', '7':'AF', '8':'BG', '9':'GB', '10':'HR' };
+function fillPlateLetterFromRegion() {
+  var code = document.getElementById('platecode').value;
+  var letterEl = document.getElementById('plateletter');
+  letterEl.value = REGION_LETTERS[code] || '';
+}
+
+// ── Live plate preview ──
+function updatePlate() {
+  var code   = document.getElementById('platecode').value;
+  var letter = document.getElementById('plateletter').value;
+  var num    = document.getElementById('platenum').value;
+
+  var regionEl = document.getElementById('plateRegion');
+  var fullEl   = document.getElementById('plateFull');
+
+  if (code) {
+    regionEl.style.display = 'inline';
+    regionEl.textContent   = code;
+  } else {
+    regionEl.style.display = 'none';
+  }
+
+  var parts = [];
+  if (letter) parts.push(letter);
+  if (num)    parts.push(num);
+  fullEl.textContent = parts.length ? parts.join(' ') : '— — — — —';
+}
+
+// ── Validation ──
+function validateField(id, checkFn) {
+  var wrapper = document.getElementById('f-' + id);
+  var ok = checkFn();
+  if (ok) {
+    wrapper.classList.remove('has-error');
+  } else {
+    wrapper.classList.add('has-error');
+  }
+  return ok;
+}
+
+function validate() {
+  var ok = true;
+
+  ok = validateField('firstname', function() {
+    return document.getElementById('firstname').value.trim().length >= 2;
+  }) && ok;
+
+  ok = validateField('lastname', function() {
+    return document.getElementById('lastname').value.trim().length >= 2;
+  }) && ok;
+
+  ok = validateField('phone', function() {
+    var v = document.getElementById('phone').value.replace(/\D/g, '');
+    if (v.indexOf('251') === 0) v = v.substring(3);
+    return /^0?[79]\d{8}$/.test(v);
+  }) && ok;
+
+  ok = validateField('brand', function() {
+    return document.getElementById('brand').value !== '';
+  }) && ok;
+
+  ok = validateField('year', function() {
+    return document.getElementById('year').value !== '';
+  }) && ok;
+
+  ok = validateField('platecode', function() {
+    return document.getElementById('platecode').value !== '';
+  }) && ok;
+
+  ok = validateField('plateletter', function() {
+    return document.getElementById('plateletter').value.trim().length >= 1;
+  }) && ok;
+
+  ok = validateField('platenum', function() {
+    return document.getElementById('platenum').value.trim().length >= 1;
+  }) && ok;
+
+  ok = validateField('licence', function() {
+    return document.getElementById('licence').files.length > 0;
+  }) && ok;
+
+  ok = validateField('idcard', function() {
+    return document.getElementById('idcard').files.length > 0;
+  }) && ok;
+
+  ok = validateField('libre', function() {
+    return document.getElementById('libre').files.length > 0;
+  }) && ok;
+
+  ok = validateField('terms', function() {
+    return document.getElementById('terms').checked;
+  }) && ok;
+
+  return ok;
+}
+
+// ── Steps indicator ──
+function setStep(n) {
+  for (var i = 1; i <= 3; i++) {
+    var el = document.getElementById('step' + i);
+    el.classList.remove('active', 'done');
+    if (i < n)  el.classList.add('done');
+    if (i === n) el.classList.add('active');
+  }
+  for (var j = 1; j <= 2; j++) {
+    var line = document.getElementById('line' + j);
+    line.classList.toggle('done', j < n);
+  }
+}
+
+// Watch fields to update step
+document.getElementById('firstname').addEventListener('input', checkSteps);
+document.getElementById('lastname').addEventListener('input', checkSteps);
+document.getElementById('phone').addEventListener('input', function() {
+  checkSteps();
+  var v = document.getElementById('phone').value.replace(/\D/g, '');
+  if (v.indexOf('251') === 0) v = v.substring(3);
+  if (/^0?[79]\d{8}$/.test(v)) document.getElementById('f-phone').classList.remove('has-error');
+});
+document.getElementById('brand').addEventListener('change', checkSteps);
+document.getElementById('year').addEventListener('change', checkSteps);
+document.getElementById('platecode').addEventListener('change', checkSteps);
+document.getElementById('platenum').addEventListener('input', checkSteps);
+document.getElementById('licence').addEventListener('change', checkSteps);
+document.getElementById('idcard').addEventListener('change', checkSteps);
+document.getElementById('libre').addEventListener('change', checkSteps);
+
+function checkSteps() {
+  var fn = document.getElementById('firstname').value.trim();
+  var ln = document.getElementById('lastname').value.trim();
+  var ph = document.getElementById('phone').value.replace(/\D/g, '');
+  if (ph.indexOf('251') === 0) ph = ph.substring(3);
+  var s1done = fn.length >= 2 && ln.length >= 2 && /^0?[79]\d{8}$/.test(ph);
+
+  var br = document.getElementById('brand').value;
+  var yr = document.getElementById('year').value;
+  var pc = document.getElementById('platecode').value;
+  var pl = document.getElementById('plateletter').value.trim();
+  var pn = document.getElementById('platenum').value.trim();
+  var s2done = s1done && br && yr && pc && pl.length >= 1 && pn.length >= 1;
+
+  var lc = document.getElementById('licence').files.length > 0;
+  var id = document.getElementById('idcard').files.length > 0;
+  var lb = document.getElementById('libre').files.length > 0;
+  var s3done = s2done && lc && id && lb;
+
+  if (s3done) setStep(3);
+  else if (s2done) setStep(3);
+  else if (s1done) setStep(2);
+  else setStep(1);
+}
+
+// ── Submit ──
+document.getElementById('regForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  if (!validate()) {
+    // Scroll to first error
+    var first = document.querySelector('.has-error');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // Show spinner
+  var btn = document.getElementById('submitBtn');
+  var sp  = document.getElementById('spinner');
+  var txt = document.getElementById('btnText');
+  btn.disabled = true;
+  sp.style.display = 'block';
+  txt.textContent = 'Submitting...';
+
+  // Build FormData
+  var fd = new FormData();
+  fd.append('firstname',   document.getElementById('firstname').value.trim());
+  fd.append('lastname',    document.getElementById('lastname').value.trim());
+  (function() {
+    var p = document.getElementById('phone').value.replace(/\D/g, '');
+    if (p.indexOf('251') === 0) p = p.substring(3);
+    if (p.length === 10 && p[0] === '0') p = p.substring(1);
+    fd.append('phone', '+251' + p);
+  })();
+  fd.append('brand',       document.getElementById('brand').value);
+  fd.append('year',        document.getElementById('year').value);
+  fd.append('platecode',   document.getElementById('platecode').value);
+  fd.append('plateletter', document.getElementById('plateletter').value.trim());
+  fd.append('platenum',    document.getElementById('platenum').value.trim());
+  fd.append('licence',     document.getElementById('licence').files[0]);
+  fd.append('idcard',      document.getElementById('idcard').files[0]);
+  fd.append('libre',       document.getElementById('libre').files[0]);
+
+  fetch('http://localhost:5050/register', {
+    method: 'POST',
+    body: fd
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      document.getElementById('formCard').style.display = 'none';
+      document.querySelector('.hero').style.display = 'none';
+      document.querySelector('.steps').style.display = 'none';
+      document.getElementById('refCode').textContent = data.ref || 'REF-' + Math.floor(Math.random()*900000+100000);
+      document.getElementById('successScreen').style.display = 'block';
+      setStep(3);
+    } else {
+      alert('Error: ' + (data.message || 'Submission failed. Please try again.'));
+      btn.disabled = false;
+      sp.style.display = 'none';
+      txt.textContent = 'Submit Registration →';
+    }
+  })
+  .catch(function() {
+    alert('Could not connect to server. Make sure the backend is running on port 5050.');
+    btn.disabled = false;
+    sp.style.display = 'none';
+    txt.textContent = 'Submit Registration →';
+  });
+});
+
+// ── Reset ──
+function resetForm() {
+  document.getElementById('regForm').reset();
+  document.getElementById('formCard').style.display = 'block';
+  document.querySelector('.hero').style.display = 'block';
+  document.querySelector('.steps').style.display = 'flex';
+  document.getElementById('successScreen').style.display = 'none';
+  document.querySelectorAll('.has-error').forEach(function(el) { el.classList.remove('has-error'); });
+  document.querySelectorAll('.upload-box').forEach(function(box) {
+    box.classList.remove('has-file');
+    if (box.dataset.previewUrl) {
+      URL.revokeObjectURL(box.dataset.previewUrl);
+      delete box.dataset.previewUrl;
+    }
+    var pid = 'preview-' + box.id.replace('ub-', '');
+    var p = document.getElementById(pid);
+    if (p) { p.innerHTML = ''; p.style.display = 'none'; }
+    box.querySelector('.upload-icon').textContent = box.id === 'ub-libre' ? '📋' : '🪪';
+  });
+  document.querySelectorAll('.upload-name').forEach(function(el) { el.textContent = ''; });
+  fillPlateLetterFromRegion();
+  updatePlate();
+  document.getElementById('plateFull').textContent = '— — — — —';
+  document.getElementById('plateRegion').style.display = 'none';
+  setStep(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+<script>
+// ════════════════════════════════════════════
+//  LANGUAGE SWITCHER — English / Amharic
+// ════════════════════════════════════════════
+var TRANSLATIONS = {
+  en: {
+    headerSub:    'Official Motor Driver Registration Portal',
+    heroBadge:    'Ethiopia Driver Registry',
+    heroTitle:    'Register Your <span>Motor</span><br>Driver Profile',
+    heroSub:      'Complete all required fields to register as an official motor driver. All documents will be verified within 2–3 business days.',
+    step1:        'Personal',
+    step2:        'Vehicle',
+    step3:        'Documents',
+    sec1:         'Personal Information',
+    lblFirstName: 'First Name',
+    lblLastName:  'Last Name',
+    lblPhone:     'Phone Number',
+    sec2:         'Vehicle Information',
+    lblBrand:     'Motor Brand',
+    lblYear:      'Manufacture Year',
+    secPlate:     'Plate Number',
+    lblRegionCode:'Region Code',
+    lblLetters:   'Letters',
+    lblNumbers:   'Numbers',
+    sec3:         'Documents & Files',
+    lblLicence:   'Driving Licence',
+    lblId:        'ID Card',
+    lblLibre:     'Libre / Vehicle Log Book',
+    upLicence:    'Upload Licence',
+    upId:         'Upload ID Card',
+    upLibre:      'Upload Libre Document',
+    upLibreSub:   'JPG, PNG or PDF — vehicle ownership document',
+    secTerms:     'Terms & Conditions',
+    termsTitle:   'Motor Driver Registration Agreement',
+    termsCheck:   'I have read and agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a> of MotoReg Ethiopia',
+    btnSubmit:    'Submit Registration →',
+    successTitle: 'Registration Submitted!',
+    successMsg:   'Your driver profile has been received.<br>We will verify your documents within <strong>2–3 business days</strong>.<br>You will be contacted via your registered phone number.',
+    btnReset:     'Register Another Driver',
+    footerRights: 'All rights reserved',
+    footerPrivacy:'Privacy Policy',
+    // Placeholders
+    phFirstName:  'e.g. Abebe',
+    phLastName:   'e.g. Kebede',
+    phPhone:      '09XXXXXXXX or 07XXXXXXXX',
+    phLetters:    'AA',
+    phNumbers:    '12345',
+    // Select default options
+    selBrand:     'Select brand...',
+    selYear:      'Select year...',
+    selCode:      'Code...',
+    // Error messages
+    errFirstName: '⚠ First name is required',
+    errLastName:  '⚠ Last name is required',
+    errPhone:     '⚠ Enter a valid phone (09X or 07X, 10 digits)',
+    errBrand:     '⚠ Select motor brand',
+    errYear:      '⚠ Select manufacture year',
+    errPlateCode: '⚠ Select region code',
+    errLetter:    '⚠ Enter plate letters',
+    errPlateNum:  '⚠ Enter plate numbers',
+    errLicence:   '⚠ Driving licence is required',
+    errId:        '⚠ ID card is required',
+    errLibre:     '⚠ Libre document is required',
+    errTerms:     '⚠ You must accept the terms to continue',
+    // Submit states
+    submitting:   'Submitting...',
+    // Terms body
+    termsBody: '<h4 data-key="termsTitle">Motor Driver Registration Agreement</h4><p>By registering on this platform, you agree to the following terms and conditions set forth by MotoReg Ethiopia.</p><p><strong>1. Accuracy of Information:</strong> All information submitted must be accurate, complete, and truthful. Submitting false information is grounds for immediate disqualification and may result in legal action.</p><p><strong>2. Document Authenticity:</strong> All uploaded documents (Driving Licence, ID Card, Libre) must be valid, government-issued originals. Forged documents will result in permanent ban and reporting to authorities.</p><p><strong>3. Data Privacy:</strong> Your personal information will be stored securely and used only for driver verification and operational purposes. We do not share your data with third parties without consent.</p><p><strong>4. Compliance:</strong> Registered drivers must comply with all Ethiopian traffic laws and regulations at all times while on duty.</p><p><strong>5. Updates:</strong> You are responsible for keeping your profile information up to date. Expired documents must be renewed within 30 days of expiry.</p><p><strong>6. Termination:</strong> MotoReg Ethiopia reserves the right to suspend or terminate any driver account found in violation of these terms.</p><p>By checking the box below, you confirm you have read, understood, and agree to all terms above.</p>'
+  },
+  am: {
+    headerSub:    'ኦፊሴላዊ የሞተር ሾፌር ምዝገባ ፖርታል',
+    heroBadge:    'የኢትዮጵያ ሾፌር መዝገብ',
+    heroTitle:    'የሞተር ሾፌር <span>መገለጫ</span><br>ይመዝገቡ',
+    heroSub:      'እንደ ኦፊሴላዊ ሞተር ሾፌር ለመመዝገብ ሁሉንም አስፈላጊ መረጃዎች ይሙሉ። ሁሉም ሰነዶች በ2–3 የሥራ ቀናት ውስጥ ይረጋገጣሉ።',
+    step1:        'የግል መረጃ',
+    step2:        'ተሽከርካሪ',
+    step3:        'ሰነዶች',
+    sec1:         'የግል መረጃ',
+    lblFirstName: 'የመጀመሪያ ስም',
+    lblLastName:  'የአባት ስም',
+    lblPhone:     'ስልክ ቁጥር',
+    sec2:         'የተሽከርካሪ መረጃ',
+    lblBrand:     'የሞተር ብራንድ',
+    lblYear:      'የምርት ዓመት',
+    secPlate:     'ታርጋ ቁጥር',
+    lblRegionCode:'የክልል ኮድ',
+    lblLetters:   'ፊደላት',
+    lblNumbers:   'ቁጥሮች',
+    sec3:         'ሰነዶች እና ፋይሎች',
+    lblLicence:   'የሹፌር ፍቃድ',
+    lblId:        'መታወቂያ ካርድ',
+    lblLibre:     'ሊብሬ / የተሽከርካሪ ሰነድ',
+    upLicence:    'ፍቃድ ይጫኑ',
+    upId:         'መታወቂያ ይጫኑ',
+    upLibre:      'ሊብሬ ሰነድ ይጫኑ',
+    upLibreSub:   'JPG፣ PNG ወይም PDF — የተሽከርካሪ ባለቤትነት ሰነድ',
+    secTerms:     'ውሎች እና ሁኔታዎች',
+    termsTitle:   'የሞተር ሾፌር ምዝገባ ስምምነት',
+    termsCheck:   'የ<a href="#">ውሎች እና ሁኔታዎች</a>ን እና የ<a href="#">ግላዊነት ፖሊሲ</a>ን አንብቤ ተስማምቻለሁ',
+    btnSubmit:    'ምዝገባ ያስገቡ →',
+    successTitle: 'ምዝገባ ተቀብሏል!',
+    successMsg:   'የሹፌር መገለጫዎ ተቀብሏል።<br>ሰነዶችዎ በ<strong>2–3 የሥራ ቀናት</strong> ውስጥ ይረጋገጣሉ።<br>በተመዘገበ ስልክ ቁጥርዎ ይገናኛሉ።',
+    btnReset:     'ሌላ ሾፌር ይመዝገቡ',
+    footerRights: 'መብቶች የተጠበቁ ናቸው',
+    footerPrivacy:'የግላዊነት ፖሊሲ',
+    // Placeholders
+    phFirstName:  'ለምሳሌ፡ አበበ',
+    phLastName:   'ለምሳሌ፡ ከበደ',
+    phPhone:      '09XXXXXXXX ወይም 07XXXXXXXX',
+    phLetters:    'AA',
+    phNumbers:    '12345',
+    selBrand:     'ብራንድ ይምረጡ...',
+    selYear:      'ዓመት ይምረጡ...',
+    selCode:      'ኮድ...',
+    // Error messages
+    errFirstName: '⚠ የመጀመሪያ ስም ያስፈልጋል',
+    errLastName:  '⚠ የአባት ስም ያስፈልጋል',
+    errPhone:     '⚠ ትክክለኛ ስልክ ቁጥር ያስፈልጋል (09X ወይም 07X)',
+    errBrand:     '⚠ የሞተር ብራንድ ይምረጡ',
+    errYear:      '⚠ የምርት ዓመት ይምረጡ',
+    errPlateCode: '⚠ የክልል ኮድ ይምረጡ',
+    errLetter:    '⚠ የታርጋ ፊደላት ያስፈልጋሉ',
+    errPlateNum:  '⚠ የታርጋ ቁጥሮች ያስፈልጋሉ',
+    errLicence:   '⚠ የሹፌር ፍቃድ ያስፈልጋል',
+    errId:        '⚠ መታወቂያ ካርድ ያስፈልጋል',
+    errLibre:     '⚠ ሊብሬ ሰነድ ያስፈልጋል',
+    errTerms:     '⚠ ለቀጠል ውሎቹን መቀበል ይኖርብዎታል',
+    submitting:   'እያስገቡ ነው...',
+    termsBody: '<h4>የሞተር ሾፌር ምዝገባ ስምምነት</h4><p>በዚህ መድረክ ላይ በመመዝገብ፣ MotoReg Ethiopia ያዘጋጁትን የሚከተሉትን ውሎች እና ሁኔታዎች ተቀብለዋል።</p><p><strong>1. የመረጃ ትክክለኛነት፡</strong> የቀረበ ሁሉም መረጃ ትክክለኛ፣ ሙሉ እና እውነተኛ መሆን አለበት። የሐሰት መረጃ ማቅረብ ወዲያውኑ ለማስወጣት መሠረት ሲሆን ሕጋዊ እርምጃ ሊያስከትል ይችላል።</p><p><strong>2. የሰነድ ትክክለኛነት፡</strong> የተጫኑ ሁሉም ሰነዶች (ሹፌር ፍቃድ፣ መታወቂያ፣ ሊብሬ) ትክክለኛ የመንግሥት ዋና ሰነዶች መሆን አለባቸው። የሐሰት ሰነዶች ቋሚ ማገድ እና ለሥልጣን ባለስልጣናት ሪፖርት ያስከትላሉ።</p><p><strong>3. የውሂብ ግላዊነት፡</strong> የግልዎ መረጃ በጥንቃቄ ተቀምጦ ለሹፌር ማረጋገጫ እና ስራዊ ዓላማዎች ብቻ ጥቅም ላይ ይውላል። ያለ ፈቃድዎ ለሦስተኛ ወገን አናጋጥምም።</p><p><strong>4. ተገዥነት፡</strong> የተመዘገቡ ሹፌሮች በአገልግሎት ላይ ሳሉ ሁሌም ሁሉንም የኢትዮጵያ ትራፊክ ሕጎች እና ደንቦች ማክበር አለባቸው።</p><p><strong>5. ዝማኔዎች፡</strong> የመገለጫ መረጃዎን ወቅታዊ ማድረግ ሃላፊነትዎ ነው። የጊዜ ማለፋቸው ሰነዶች በ30 ቀናት ውስጥ መታደስ አለባቸው።</p><p><strong>6. መቋረጥ፡</strong> MotoReg Ethiopia ከእነዚህ ውሎች ጋር ተቃርኖ ያለ ማንኛውም የሹፌር መለያ ለማገድ ወይም ለመዝጋት መብቱ የተጠበቀ ነው።</p><p>ከዚህ በታች ያለውን ሳጥን በማረጋገጥ ሁሉንም ውሎቹን አንብቤ፣ ተረድቼ እና ተስማምቻለሁ ብለው ያረጋግጣሉ።</p>'
+  }
+};
+
+var currentLang = 'am';
+
+// Error message element map
+var ERR_KEYS = {
+  'firstname':  'errFirstName',
+  'lastname':   'errLastName',
+  'phone':      'errPhone',
+  'brand':      'errBrand',
+  'year':       'errYear',
+  'platecode':  'errPlateCode',
+  'plateletter':'errLetter',
+  'platenum':   'errPlateNum',
+  'licence':    'errLicence',
+  'idcard':     'errId',
+  'libre':      'errLibre',
+  'terms':      'errTerms'
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  var t = TRANSLATIONS[lang];
+
+  // Toggle button states
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('btnAm').classList.toggle('active', lang === 'am');
+
+  // Toggle Amharic font class on html element
+  document.documentElement.classList.toggle('lang-am', lang === 'am');
+
+  // Update all data-key elements
+  var els = document.querySelectorAll('[data-key]');
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    var key = el.getAttribute('data-key');
+    if (t[key] !== undefined) {
+      el.innerHTML = t[key];
+    }
+  }
+
+  // Update placeholders
+  document.getElementById('firstname').placeholder  = t.phFirstName;
+  document.getElementById('lastname').placeholder   = t.phLastName;
+  document.getElementById('phone').placeholder      = t.phPhone;
+  document.getElementById('plateletter').placeholder = t.phLetters;
+  document.getElementById('platenum').placeholder   = t.phNumbers;
+
+  // Update select default options
+  document.getElementById('brand').options[0].text    = t.selBrand;
+  document.getElementById('year').options[0].text     = t.selYear;
+  document.getElementById('platecode').options[0].text = t.selCode;
+
+  // Update all error messages
+  for (var fieldId in ERR_KEYS) {
+    var field = document.getElementById('f-' + fieldId);
+    if (field) {
+      var errEl = field.querySelector('.err-msg');
+      if (errEl && t[ERR_KEYS[fieldId]]) {
+        errEl.innerHTML = t[ERR_KEYS[fieldId]];
+      }
+    }
+  }
+
+  // Update terms box
+  var termsBox = document.querySelector('.terms-box');
+  if (termsBox && t.termsBody) { termsBox.innerHTML = t.termsBody; }
+
+  // Update submit button text (only if not mid-submit)
+  var btnText = document.getElementById('btnText');
+  if (btnText && !document.getElementById('submitBtn').disabled) {
+    btnText.innerHTML = t.btnSubmit;
+  }
+
+  // Update document title
+  document.title = lang === 'am' ? 'የሞተር ሾፌር ምዝገባ' : 'Motor Driver Registration';
+  document.documentElement.setAttribute('lang', lang === 'am' ? 'am' : 'en');
+}
+
+// Default to Amharic on load
+setLang('am');
+</script>
+</body>
+</html>

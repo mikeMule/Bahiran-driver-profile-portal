@@ -1,0 +1,9 @@
+.env
+.env.local
+.venv/
+__pycache__/
+*.pyc
+uploads/
+*.log
+service-account*.json
+admin_users.json
