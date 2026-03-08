@@ -41,6 +41,7 @@ service-account*.json
 # Project setup / generated (do not commit)
 cursor_project_file_structure_setup.md
 embed_logo.py
+DEPLOYMENT.md
 
 # Migrations (ignore local migration output folder if used)
 migration/

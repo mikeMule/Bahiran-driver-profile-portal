@@ -40,11 +40,16 @@ ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".pdf"}
 PORT        = int(os.environ.get("PORT", "5050"))
 
 # Supabase (from .env) — URL + key only (no Postgres connection string)
-SUPABASE_URL = os.environ.get("SUPABASE_URL") or os.environ.get("EXPO_PUBLIC_SUPABASE_URL")
+SUPABASE_URL = (
+    os.environ.get("SUPABASE_URL")
+    or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+    or os.environ.get("EXPO_PUBLIC_SUPABASE_URL")
+)
 SUPABASE_ANON_KEY = (
     os.environ.get("SUPABASE_ANON_KEY")
-    or os.environ.get("EXPO_PUBLIC_SUPABASE_KEY")
     or os.environ.get("SUPABASE_KEY")
+    or os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+    or os.environ.get("EXPO_PUBLIC_SUPABASE_KEY")
 )
 # Optional: direct Postgres URL (if set, used as fallback; Supabase API preferred when URL+key set)
 SUPABASE_DATABASE_URL = os.environ.get("SUPABASE_DATABASE_URL") or os.environ.get("DATABASE_URL")
@@ -52,10 +57,6 @@ SUPABASE_DATABASE_POOLER_URL = os.environ.get("SUPABASE_DATABASE_POOLER_URL")
 
 # Supabase Storage — bucket name for driver document uploads
 SUPABASE_STORAGE_BUCKET = os.environ.get("SUPABASE_STORAGE_BUCKET", "driver-documents").strip()
-
-# Google Drive (disabled — requires Google Workspace Shared Drive; using Supabase Storage instead)
-GOOGLE_DRIVE_CREDENTIALS = None
-GOOGLE_DRIVE_FOLDER_ID = ""
 
 # No local uploads — files go to Supabase Storage only
 
@@ -154,15 +155,15 @@ def get_file_from_storage(storage_path):
         return (None, None)
 
 
-def save_file(file_obj, subfolder, drive_parent_id=None):
+def save_file(file_obj, subfolder, ref_folder=None):
     """Save file to Supabase Storage only. No local uploads — everything goes to DB/Storage.
-    drive_parent_id is the REF folder name. Returns 'storage:PATH' or None on failure.
+    ref_folder is the REF folder name used in storage path. Returns 'storage:PATH' or None on failure.
     """
     if not file_obj or not file_obj.filename or not allowed_file(file_obj.filename):
         return None
     ext  = os.path.splitext(file_obj.filename)[1].lower()
     name = f"{uuid.uuid4().hex}{ext}"
-    folder = drive_parent_id if drive_parent_id else subfolder
+    folder = ref_folder if ref_folder else subfolder
     storage_path = f"{folder}/{name}"
 
     if not (SUPABASE_URL and SUPABASE_ANON_KEY):
@@ -170,10 +171,6 @@ def save_file(file_obj, subfolder, drive_parent_id=None):
     result = upload_file_to_supabase(file_obj, storage_path)
     return result
 
-
-def get_file_from_drive(file_id):
-    """Legacy shim — kept so /file/<id> route still works for old Drive-stored files."""
-    return (None, None)
 
 def load_db():
     """Load registrations from local JSON file (fallback when no DB configured)."""
@@ -703,24 +700,30 @@ def register():
         subfolder = reg_id
 
         # Use REF as folder name in Supabase Storage: REF-XXXXX/uuid.ext
-        idcard_path = save_file(idcard_file, subfolder, drive_parent_id=ref)
+        _storage_ok = bool(SUPABASE_URL and SUPABASE_ANON_KEY)
+        if not _storage_ok:
+            return jsonify({
+                "success": False,
+                "message": "File storage is not configured. Set SUPABASE_URL and SUPABASE_KEY in .env and ensure the storage bucket exists."
+            }), 500
+        idcard_path = save_file(idcard_file, subfolder, ref_folder=ref)
         if is_bike:
             licence_path = None
             libre_path   = None
         else:
-            licence_path = save_file(licence_file, subfolder, drive_parent_id=ref)
-            libre_path   = save_file(libre_file, subfolder, drive_parent_id=ref)
+            licence_path = save_file(licence_file, subfolder, ref_folder=ref)
+            libre_path   = save_file(libre_file, subfolder, ref_folder=ref)
 
         # All required files must have saved successfully
         if not idcard_path:
             return jsonify({
                 "success": False,
-                "message": "Failed to save ID card file"
+                "message": "Failed to save ID card file. Check server logs for details (e.g. storage URL, auth, or bucket name)."
             }), 500
         if not is_bike and not all([licence_path, libre_path]):
             return jsonify({
                 "success": False,
-                "message": "Failed to save one or more uploaded files"
+                "message": "Failed to save one or more uploaded files. Check server logs for storage errors."
             }), 500
 
         if is_bike:
@@ -869,9 +872,9 @@ def serve_frontend():
     return html, 200, {"Content-Type": "text/html; charset=utf-8"}
 
 
-# Serve uploaded files: Supabase Storage or local disk
+# Serve files from Supabase Storage
 @app.route("/file/<path:storage_path>")
-def serve_drive_file(storage_path):
+def serve_storage_file(storage_path):
     """Stream a file from Supabase Storage (stored as 'storage:PATH' in DB)."""
     data, content_type = get_file_from_storage(storage_path)
     if data is None:
@@ -963,12 +966,24 @@ def admin_required(f):
     return decorated
 
 
+def _admin_html_path():
+    """Resolve admin.html: prefer admin/admin.html, then admin.html in project root."""
+    base = Path(BASE_DIR).resolve()
+    for candidate in (base / "admin" / "admin.html", base / "admin.html"):
+        if candidate.is_file():
+            return str(candidate)
+    return None
+
+
 @app.route("/admin", methods=["GET"])
 @app.route("/admin.html", methods=["GET"])
 def serve_admin():
-    admin_path = os.path.join(BASE_DIR, "admin.html")
-    if not os.path.exists(admin_path):
-        return "<h2>admin.html not found</h2>", 404
+    admin_path = _admin_html_path()
+    if not admin_path:
+        return "<h2>admin.html not found</h2><p>Looked in: %s and %s</p>" % (
+            os.path.join(BASE_DIR, "admin", "admin.html"),
+            os.path.join(BASE_DIR, "admin.html"),
+        ), 404
     with open(admin_path, "r", encoding="utf-8") as f:
         html = f.read()
     return html, 200, {"Content-Type": "text/html; charset=utf-8"}

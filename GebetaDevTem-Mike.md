@@ -11,8 +11,7 @@
 Bahiran-driver-profile-portal/
 ├── api/                          # Backend API (all server logic)
 │   ├── __init__.py               # Exposes app for run.py
-│   ├── app.py                    # Flask app: routes, DB, Supabase, admin, file serving
-│   └── check_drive.py            # Google Drive diagnostic script
+│   └── app.py                    # Flask app: routes, DB, Supabase, admin, file serving
 ├── migrations/                   # SQL migrations (PostgreSQL / Supabase)
 │   ├── 000_complete_registrations_schema.sql
 │   ├── 001_create_registrations.sql
@@ -23,7 +22,6 @@ Bahiran-driver-profile-portal/
 ├── uploads/                      # Local uploads (created at runtime; gitignored)
 ├── run.py                        # Entry point: python run.py
 ├── server.py                     # Backward-compat launcher → api.app
-├── check_drive.py                # Launcher → api.check_drive
 ├── index.html                 # Registration frontend (CSS can be inlined)
 ├── admin.html                    # Admin panel frontend
 ├── .env.example                  # Example env vars (copy to .env)
@@ -54,7 +52,6 @@ Bahiran-driver-profile-portal/
    - `python run.py` (recommended), or
    - `python server.py`, or
    - `python -m api.app`
-5. **Drive diagnostic (optional):** `python -m api.check_drive` or `python check_drive.py`.
 
 Default URL: **http://localhost:5050/** (registration), **http://localhost:5050/admin** (admin).
 
@@ -68,15 +65,11 @@ Default URL: **http://localhost:5050/** (registration), **http://localhost:5050/
   - **Routes:** `GET /`, `POST /register`, `GET /registrations`, `GET /stats`, `GET /file/...`, `GET /uploads/...`, and full admin set (`/admin`, `/admin/login`, `/admin/registrations`, `/admin/delete`, `/admin/update-status`, `/admin/download-zip`, `/admin/send-sms`, `/admin/file/...`).  
   - **Comments:** Docstrings and section comments for each task.
 
-- **api/check_drive.py**  
-  - Diagnostic: load credentials (from env or project root), list Shared Drives, check `GOOGLE_DRIVE_FOLDER_ID`, optional upload test.  
-  - Run from project root so `CREDS_FILE` defaults to project root.
-
 - **run.py**  
   - Loads `.env` from project root, imports `app` and `PORT` from `api.app`, runs `app.run()`.
 
-- **server.py / check_drive.py (root)**  
-  - Thin launchers for backward compatibility; they add project root to `sys.path` and delegate to `api.app` and `api.check_drive`.
+- **server.py (root)**  
+  - Thin launcher for backward compatibility; adds project root to `sys.path` and delegates to `api.app`.
 
 ---
 
@@ -99,7 +92,7 @@ Default URL: **http://localhost:5050/** (registration), **http://localhost:5050/
 ## Comments and tasks
 
 - All API functions and main tasks in `api/app.py` are documented with docstrings or section comments.  
-- `api/check_drive.py` and `run.py` have module docstrings and brief inline comments where useful.
+- `run.py` has a module docstring and brief inline comments where useful.
 
 ---
 
