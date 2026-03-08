@@ -42,8 +42,12 @@ service-account*.json
 cursor_project_file_structure_setup.md
 embed_logo.py
 
-# Migrations (ignore local migration output folder if used)
-migration/
+# Migrations (ignore migration folder)
+migrations/
+
+# Docs and temp (ignore)
+DEPLOYMENT.md
+tmp_logo_b64.txt
 
 # IDE and OS
 .idea/

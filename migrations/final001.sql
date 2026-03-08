@@ -7,13 +7,13 @@
 -- Or: Supabase SQL Editor → paste and run
 -- =============================================================================
 
-CREATE SCHEMA IF NOT EXISTS bahiran_driver;
+CREATE SCHEMA IF NOT EXISTS public;
 
 -- -----------------------------------------------------------------------------
--- Table: bahiran_driver.registrations
+-- Table: public.registrations
 -- Car/Motor: full vehicle + documents. Bicycles: personal + ID card only.
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS bahiran_driver.registrations (
+CREATE TABLE IF NOT EXISTS public.registrations (
     id              TEXT PRIMARY KEY,
     ref             TEXT NOT NULL UNIQUE,
     firstname       TEXT NOT NULL,
@@ -37,14 +37,14 @@ CREATE TABLE IF NOT EXISTS bahiran_driver.registrations (
 );
 
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_registrations_ref ON bahiran_driver.registrations (ref);
-CREATE INDEX IF NOT EXISTS idx_registrations_status ON bahiran_driver.registrations (status);
-CREATE INDEX IF NOT EXISTS idx_registrations_registered_at ON bahiran_driver.registrations (registered_at DESC);
-CREATE INDEX IF NOT EXISTS idx_registrations_phone ON bahiran_driver.registrations (phone);
-CREATE INDEX IF NOT EXISTS idx_registrations_transport_type ON bahiran_driver.registrations (transport_type);
+CREATE INDEX IF NOT EXISTS idx_registrations_ref ON public.registrations (ref);
+CREATE INDEX IF NOT EXISTS idx_registrations_status ON public.registrations (status);
+CREATE INDEX IF NOT EXISTS idx_registrations_registered_at ON public.registrations (registered_at DESC);
+CREATE INDEX IF NOT EXISTS idx_registrations_phone ON public.registrations (phone);
+CREATE INDEX IF NOT EXISTS idx_registrations_transport_type ON public.registrations (transport_type);
 
 -- Trigger: auto-update updated_at
-CREATE OR REPLACE FUNCTION bahiran_driver.set_updated_at()
+CREATE OR REPLACE FUNCTION public.set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -52,30 +52,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trigger_registrations_updated_at ON bahiran_driver.registrations;
+DROP TRIGGER IF EXISTS trigger_registrations_updated_at ON public.registrations;
 CREATE TRIGGER trigger_registrations_updated_at
-  BEFORE UPDATE ON bahiran_driver.registrations
+  BEFORE UPDATE ON public.registrations
   FOR EACH ROW
-  EXECUTE PROCEDURE bahiran_driver.set_updated_at();
+  EXECUTE PROCEDURE public.set_updated_at();
 
 -- Comments
-COMMENT ON TABLE bahiran_driver.registrations IS 'Bahiran Delivery Driver Registration (Car, Motor, Bicycles)';
-COMMENT ON COLUMN bahiran_driver.registrations.transport_type IS 'car, motor, or bike';
-COMMENT ON COLUMN bahiran_driver.registrations.brand IS 'Vehicle brand; NULL for Bicycles';
-COMMENT ON COLUMN bahiran_driver.registrations.year IS 'Manufacture year; NULL for Bicycles';
-COMMENT ON COLUMN bahiran_driver.registrations.plate IS 'Full plate; NULL for Bicycles';
-COMMENT ON COLUMN bahiran_driver.registrations.licence_file IS 'Driving licence path; NULL for Bicycles';
-COMMENT ON COLUMN bahiran_driver.registrations.libre_file IS 'Libre path; NULL for Bicycles';
-COMMENT ON COLUMN bahiran_driver.registrations.status IS 'pending, approved, rejected';
+COMMENT ON TABLE public.registrations IS 'Bahiran Delivery Driver Registration (Car, Motor, Bicycles)';
+COMMENT ON COLUMN public.registrations.transport_type IS 'car, motor, or bike';
+COMMENT ON COLUMN public.registrations.brand IS 'Vehicle brand; NULL for Bicycles';
+COMMENT ON COLUMN public.registrations.year IS 'Manufacture year; NULL for Bicycles';
+COMMENT ON COLUMN public.registrations.plate IS 'Full plate; NULL for Bicycles';
+COMMENT ON COLUMN public.registrations.licence_file IS 'Driving licence path; NULL for Bicycles';
+COMMENT ON COLUMN public.registrations.libre_file IS 'Libre path; NULL for Bicycles';
+COMMENT ON COLUMN public.registrations.status IS 'pending, approved, rejected';
 
 -- Permissions
-GRANT USAGE ON SCHEMA bahiran_driver TO postgres;
-GRANT SELECT, INSERT, UPDATE, DELETE ON bahiran_driver.registrations TO postgres;
-GRANT EXECUTE ON FUNCTION bahiran_driver.set_updated_at() TO postgres;
+GRANT USAGE ON SCHEMA public TO postgres;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.registrations TO postgres;
+GRANT EXECUTE ON FUNCTION public.set_updated_at() TO postgres;
 
 -- =============================================================================
 -- Optional: RLS for Supabase (uncomment if using Supabase Auth)
 -- =============================================================================
--- ALTER TABLE bahiran_driver.registrations ENABLE ROW LEVEL SECURITY;
--- CREATE POLICY "Allow anon read" ON bahiran_driver.registrations FOR SELECT USING (true);
--- CREATE POLICY "Allow anon insert" ON bahiran_driver.registrations FOR INSERT WITH CHECK (true);
+-- ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY "Allow anon read" ON public.registrations FOR SELECT USING (true);
+-- CREATE POLICY "Allow anon insert" ON public.registrations FOR INSERT WITH CHECK (true);
