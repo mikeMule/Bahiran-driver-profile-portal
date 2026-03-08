@@ -76,15 +76,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 /* ─────────────────── TOPBAR ─────────────────── */
 .topbar{
   background:var(--brand);
-  padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;height:44px;display:flex;align-items:center;justify-content:space-between;
   position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(88,45,24,.3);
 }
 .topbar-left{display:flex;align-items:center;gap:10px;}
-.topbar-left .t-icon{font-size:20px;}
-.topbar-left .t-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:.2px;}
+.topbar-left .t-icon{font-size:16px;}
+.topbar-left .t-title{font-size:12px;font-weight:700;color:#fff;letter-spacing:.02em;}
+.topbar-nav{display:flex;align-items:center;gap:4px;margin-left:16px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.topbar-nav a{color:rgba(255,255,255,.75);text-decoration:none;padding:4px 8px;border-radius:4px;transition:color .15s,background .15s;}
+.topbar-nav a:hover{color:#fff;background:rgba(255,255,255,.15);}
+.topbar-nav .current{color:#fff;cursor:default;}
+.topbar-nav .sep{color:rgba(255,255,255,.4);user-select:none;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
-.admin-chip{background:rgba(255,255,255,.18);color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.25);}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.85);padding:5px 12px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.admin-chip{background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid rgba(255,255,255,.25);}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.85);padding:4px 10px;border-radius:var(--r);font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
 .btn-logout:hover{background:rgba(255,255,255,.15);color:#fff;}
 
 /* ─────────────────── STATS ─────────────────── */
@@ -172,6 +177,10 @@ td .plate{font-family:var(--mono);font-size:11px;background:var(--surface2);bord
 .status-pending {background:var(--yellow-bg);color:var(--yellow);}
 .status-approved{background:var(--green-bg);color:var(--green);}
 .status-rejected{background:var(--red-bg);  color:var(--red);}
+.transport-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap;}
+.transport-badge.transport-car{background:#eff6ff;color:#1d4ed8;}
+.transport-badge.transport-motor{background:#fef3c7;color:#b45309;}
+.transport-badge.transport-bike{background:#ecfdf5;color:#0e9f6e;}
 
 /* ─────────────────── ACCORDION ─────────────────── */
 /* Hide entire accordion row until expanded — keeps actions inside table, no row between data rows */
@@ -209,6 +218,8 @@ td .plate{font-family:var(--mono);font-size:11px;background:var(--surface2);bord
 .thumb-label{padding:5px 6px;font-size:9px;font-weight:700;text-transform:uppercase;color:var(--brand);letter-spacing:.5px;text-align:center;border-top:1px solid var(--border);transition:all .15s;background:#fff;}
 .doc-thumb-empty{width:90px;height:96px;border:1px dashed var(--border2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--muted2);background:var(--surface2);}
 .doc-thumb-empty span{font-size:11px;font-size:9px;text-transform:uppercase;letter-spacing:.5px;}
+.doc-thumb-not-required{cursor:default;opacity:.85;}
+.doc-thumb-not-required span:last-child{font-size:9px;text-align:center;line-height:1.2;}
 
 /* ─────────────────── ACC ACTIONS ─────────────────── */
 .accordion-inner.open .acc-actions{
@@ -312,6 +323,11 @@ input[type=checkbox]{accent-color:var(--brand);width:14px;height:14px;cursor:poi
     <div class="topbar-left">
       <span class="t-icon">🏍️</span>
       <span class="t-title">Bahiran Driver Profile — Portal</span>
+      <nav class="topbar-nav">
+        <a href="/">Register</a>
+        <span class="sep">|</span>
+        <span class="current">Admin</span>
+      </nav>
     </div>
     <div class="topbar-right">
       <span class="admin-chip" id="admin-name-display">admin</span>
@@ -354,12 +370,12 @@ input[type=checkbox]{accent-color:var(--brand);width:14px;height:14px;cursor:poi
       <thead>
         <tr>
           <th style="width:36px"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this)"/></th>
-          <th>REF</th><th>Driver</th><th>Phone</th><th>Plate</th>
+          <th>REF</th><th>Driver</th><th>Phone</th><th>Plate</th><th>Transport</th>
           <th>Brand / Year</th><th>Status</th><th>Registered</th>
         </tr>
       </thead>
       <tbody id="table-body">
-        <tr class="loading-row"><td colspan="8"><div class="loader"></div> Loading…</td></tr>
+        <tr class="loading-row"><td colspan="9"><div class="loader"></div> Loading…</td></tr>
       </tbody>
     </table>
   </div>
@@ -423,6 +439,13 @@ function statusBadge(s){
   const m = {pending:'status-pending',approved:'status-approved',rejected:'status-rejected'};
   return `<span class="status-badge ${m[s]||'status-pending'}">${s||'pending'}</span>`;
 }
+function transportLabel(t){
+  const v = (t||'').toLowerCase();
+  const icons = {car:'🚗',motor:'🏍',bike:'🚲'};
+  const labels = {car:'Car',motor:'Motor',bike:'Bicycles'};
+  const icon = icons[v]||'•'; const label = labels[v]||(v||'—');
+  return `<span class="transport-badge transport-${v}" title="${label}">${icon} ${label}</span>`;
+}
 function normalizePhone(p){
   if(!p) return p;
   p = p.replace(/[\s\-]/g,'');
@@ -443,7 +466,10 @@ function setBtnLoading(btn, loading){
 /* ── Doc thumbnails ─────────────────────────────── */
 function escapeAttr(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escapeJs(s){ return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"'); }
-function docThumbHtml(url, label){
+function docThumbHtml(url, label, notRequiredLabel){
+  if(notRequiredLabel){
+    return `<div class="doc-thumb-empty doc-thumb-not-required"><span style="font-size:18px">—</span><span>${escapeAttr(notRequiredLabel)}</span></div>`;
+  }
   if(!url){
     return `<div class="doc-thumb-empty"><span style="font-size:22px">📄</span><span>${escapeAttr(label)}</span></div>`;
   }
@@ -452,7 +478,7 @@ function docThumbHtml(url, label){
   const pdf = isPdf(url);
   const inner = pdf
     ? `<div class="thumb-pdf">📕</div>`
-    : `<img class="thumb-img" src="${urlA}" alt="${labelA}" onerror="this.outerHTML='&lt;div class=thumb-err&gt;🖼&lt;/div&gt;'" loading="lazy" />`;
+    : `<img class="thumb-img" src="${urlA}" alt="${labelA}" onerror="this.outerHTML='&lt;div class=thumb-err&gt;🖼&lt;/div&gt;'" loading="lazy" referrerpolicy="no-referrer" />`;
   return `<div class="doc-thumb" onclick="openImgModal('${urlJ}','${labelJ}')" title="View ${labelA}">
     ${inner}
     <div class="thumb-label">${labelA}</div>
@@ -545,16 +571,20 @@ async function doLogout(){
 /* ── Data ───────────────────────────────────────── */
 async function loadData(){
   document.getElementById('table-body').innerHTML =
-    '<tr class="loading-row"><td colspan="8"><div class="loader"></div> Loading registrations…</td></tr>';
+    '<tr class="loading-row"><td colspan="9"><div class="loader"></div> Loading registrations…</td></tr>';
   try{
     const r = await fetch('/admin/registrations');
-    if(r.status === 401){ doLogout(); return; }
+    if(r.status === 401){
+      try { const d = await r.json(); document.getElementById('login-err').textContent = d.message || 'Session expired. Please log in again.'; } catch(_) {}
+      doLogout();
+      return;
+    }
     const d = await r.json();
     allData = d.data || [];
     updateStats(); renderTable();
   } catch(e){
     document.getElementById('table-body').innerHTML =
-      '<tr class="loading-row"><td colspan="8" style="color:var(--red)">Failed to load data. Check connection.</td></tr>';
+      '<tr class="loading-row"><td colspan="9" style="color:var(--red)">Failed to load data. Check connection.</td></tr>';
   }
 }
 function refreshData(){ loadData(); toast('Refreshed'); }
@@ -577,7 +607,8 @@ function getFiltered(){
       (r.phone||'').includes(q) ||
       (r.plate||'').toLowerCase().includes(q) ||
       (r.ref||'').toLowerCase().includes(q) ||
-      (r.brand||'').toLowerCase().includes(q);
+      (r.brand||'').toLowerCase().includes(q) ||
+      (r.transport_type||'').toLowerCase().includes(q);
     return matchS && matchQ;
   });
 }
@@ -586,7 +617,7 @@ function renderTable(){
   const rows  = getFiltered();
   const tbody = document.getElementById('table-body');
   if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="e-icon">🔍</div><p>No registrations found</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="e-icon">🔍</div><p>No registrations found</p></div></td></tr>`;
     updateBulkButtons(); return;
   }
   tbody.innerHTML = '';
@@ -596,6 +627,7 @@ function renderTable(){
     const idUrl  = r.idcard_file_url  || '';
     const libUrl = r.libre_file_url   || '';
     const safeName = (r.fullname||'').replace(/['"]/g,'');
+    const isBike = (r.transport_type||'').toLowerCase() === 'bike';
 
     /* ── main row ── */
     const tr = document.createElement('tr');
@@ -611,6 +643,7 @@ function renderTable(){
       <td onclick="toggleAcc('${r.ref}')"><span class="name">${r.fullname||'—'}</span></td>
       <td onclick="toggleAcc('${r.ref}')"><span class="phone">${phone||'—'}</span></td>
       <td onclick="toggleAcc('${r.ref}')"><span class="plate">${r.plate||'—'}</span></td>
+      <td onclick="toggleAcc('${r.ref}')">${transportLabel(r.transport_type)}</td>
       <td onclick="toggleAcc('${r.ref}')" style="color:var(--text2)">${r.brand||'—'} ${r.year||''}</td>
       <td onclick="toggleAcc('${r.ref}')">${statusBadge(r.status)}</td>
       <td onclick="toggleAcc('${r.ref}')" style="color:var(--muted);font-size:11px">${fmtDate(r.registered_at)}</td>`;
@@ -619,7 +652,7 @@ function renderTable(){
     /* ── accordion row ── */
     const accTr = document.createElement('tr');
     accTr.className = 'accordion-row' + (expandedRef === r.ref ? ' open' : '');
-    accTr.innerHTML = `<td colspan="8">
+    accTr.innerHTML = `<td colspan="9">
       <div class="accordion-inner${expandedRef===r.ref?' open':''}" id="acc-${r.ref}">
         <div class="acc-grid">
 
@@ -633,6 +666,7 @@ function renderTable(){
 
           <div class="acc-section">
             <h4>Vehicle Information</h4>
+            <div class="acc-field"><div class="key">Transport Type</div><div class="val">${transportLabel(r.transport_type)}</div></div>
             <div class="acc-field"><div class="key">Brand</div><div class="val">${r.brand||'—'}</div></div>
             <div class="acc-field"><div class="key">Year</div><div class="val">${r.year||'—'}</div></div>
             <div class="acc-field"><div class="key">Plate Number</div><div class="val">${r.plate||'—'}</div></div>
@@ -642,9 +676,7 @@ function renderTable(){
           <div class="acc-section">
             <h4 class="acc-doc-title">Documents <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted2)">— tap to view</span></h4>
             <div class="doc-thumbs">
-              ${docThumbHtml(licUrl,'Licence')}
-              ${docThumbHtml(idUrl,'ID Card')}
-              ${docThumbHtml(libUrl,'Libre')}
+              ${isBike ? docThumbHtml(null,'Licence','Not required (Bicycles)') + docThumbHtml(idUrl,'ID Card',null) + docThumbHtml(null,'Libre','Not required (Bicycles)') : docThumbHtml(licUrl,'Licence',null) + docThumbHtml(idUrl,'ID Card',null) + docThumbHtml(libUrl,'Libre',null)}
             </div>
           </div>
 

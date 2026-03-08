@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motor Driver Registration</title>
+<link rel="icon" href="/assets/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/*
+ * Bahiran Delivery Driver Registration - Motor Driver Registration
+ * Black & white, Metropolis, pro & fast (inline from css/register.css)
+ */
+@import url("https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/metropolis.min.css");
+
+:root {
+  --primary: #111111;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface2: #f5f5f5;
+  --border: #e5e7eb;
+  --border-focus: #111111;
+  --text: #111111;
+  --muted: #6b7280;
+  --error: #b91c1c;
+  --success: #15803d;
+  --radius: 4px;
+  --font: 'Metropolis', -apple-system, BlinkMacSystemFont, sans-serif;
+  --heading: 'Metropolis', sans-serif;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+
+/* Header */
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+
+.logo-box {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.logo-box .logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.header-text h1 {
+  font-family: var(--heading);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.header-text p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* Wrapper */
+.wrapper {
+  max-width: 680px;
+  margin: 40px auto 0;
+  padding: 0 20px;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.hero h2 {
+  font-family: var(--heading);
+  font-size: clamp(26px, 5vw, 38px);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.hero h2 span {
+  color: var(--primary);
+}
+
+.hero p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.step.active .step-dot {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.step.active {
+  color: var(--primary);
+}
+
+.step.done .step-dot {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+.step.done {
+  color: var(--success);
+}
+.step-line.done {
+  background: var(--success);
+}
+
+.step-line {
+  width: 40px;
+  height: 2px;
+  background: var(--border);
+  margin: 0 4px;
+  transition: background 0.2s;
+}
+
+/* Form card */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Section title */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+  margin: 24px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title:first-of-type {
+  margin-top: 0;
+}
+
+.section-num {
+  width: 22px;
+  height: 22px;
+  background: var(--primary);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Transport type selection — compact boxes, green check when selected */
+.transport-type-wrap {
+  margin-top: 6px;
+}
+.transport-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 320px;
+}
+.transport-opt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 8px;
+  min-height: 64px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.transport-opt:hover {
+  border-color: var(--border-focus);
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06);
+}
+.transport-opt.selected {
+  border-color: var(--success);
+  background: rgba(21, 128, 61, 0.06);
+  box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.2);
+}
+.transport-opt .transport-check {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  animation: transport-check-in 0.25s ease-out;
+}
+.transport-opt.selected .transport-check {
+  display: flex;
+}
+@keyframes transport-check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.transport-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.transport-label {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.transport-type-wrap .err-msg {
+  display: block;
+  margin-top: 6px;
+}
+.transport-type-wrap:not(.has-error) .err-msg { display: none; }
+.transport-type-wrap.has-error .err-msg { display: block; }
+.vehicle-details-wrap {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 560px) {
+  .transport-options {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+  .transport-opt {
+    min-height: 56px;
+    padding: 8px 10px;
+  }
+}
+
+/* Grid — aligned fields */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.col-full {
+  grid-column: 1 / -1;
+}
+
+/* Field — consistent alignment */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 0;
+  min-width: 0;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+.req {
+  color: var(--error);
+}
+
+/* Phone */
+.phone-wrap {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--surface2);
+  min-height: 44px;
+}
+
+.phone-wrap:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.08);
+}
+
+.phone-prefix {
+  padding: 0 12px;
+  background: var(--surface2);
+  border-right: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 44px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.phone-wrap input {
+  border: none;
+  background: transparent;
+  min-height: 42px;
+  padding: 10px 12px;
+}
+
+/* Restore native checkbox so checked state is visible (global input has appearance:none) */
+input[type="checkbox"] {
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.08);
+}
+
+input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.12);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+select {
+  cursor: pointer;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+/* Error */
+.field.has-error input,
+.field.has-error select,
+.field.has-error .phone-wrap,
+.field.has-error .upload-box {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12) !important;
+}
+
+.err-msg {
+  font-size: 11px;
+  color: var(--error);
+  display: none;
+}
+
+.field.has-error .err-msg {
+  display: block;
+}
+
+/* Duplicate registration / server error message — red */
+.server-error-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  color: #b91c1c !important;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.server-error-box .server-error-icon,
+.server-error-box .server-error-text {
+  color: #b91c1c !important;
+}
+.server-error-box .server-error-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.server-error-box .server-error-text {
+  flex: 1;
+}
+
+/* Upload box */
+.upload-box {
+  border: 2px dashed var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  background: var(--surface2);
+}
+
+.upload-box:hover {
+  border-color: var(--primary);
+}
+
+.upload-box.has-file {
+  border-style: solid;
+  border-color: var(--success);
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.upload-preview {
+  display: none;
+  width: 100%;
+  max-height: 120px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+.upload-preview img {
+  width: 100%;
+  height: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  display: block;
+}
+.upload-box.has-file .upload-preview:not(:empty) {
+  display: block;
+}
+.upload-box.has-file .upload-preview:not(:empty) ~ .upload-icon {
+  display: none;
+}
+.upload-box.has-file .upload-preview:not(:empty) ~ .upload-label,
+.upload-box.has-file .upload-preview:not(:empty) ~ .upload-sub {
+  display: none;
+}
+
+.upload-box input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-icon {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.upload-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.upload-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.upload-name {
+  display: none;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--success);
+  word-break: break-all;
+}
+
+.upload-box.has-file .upload-name {
+  display: block;
+}
+
+/* Plate preview */
+.plate-preview {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 16px;
+  margin-top: 8px;
+  font-family: var(--heading);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.plate-region { margin-right: 8px; color: var(--muted); }
+.plate-eth { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+/* Terms */
+.terms-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 12px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox-label {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  user-select: none;
+}
+
+.checkbox-row.has-error .checkbox-label {
+  color: var(--error);
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  background: var(--primary);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  margin-top: 20px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(17, 17, 17, 0.2);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Success screen */
+#successScreen {
+  display: none;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: rgba(22, 163, 74, 0.1);
+  border: 2px solid var(--success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 24px;
+}
+
+#successScreen h2 {
+  font-family: var(--heading);
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+#successScreen p {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.ref-box {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-family: var(--heading);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.success-data {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 24px;
+  text-align: left;
+  max-width: 360px;
+  margin: 0 auto 24px;
+}
+
+.success-data-row {
+  font-size: 14px;
+  padding: 4px 0;
+  color: var(--text);
+}
+
+.success-data-row strong {
+  color: var(--muted);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* Lang switcher */
+.lang-switcher {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.lang-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.lang-btn:not(.active):hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 48px;
+  padding: 0 20px;
+}
+.footer p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .form-card {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .wrapper {
+    padding: 0 16px;
+  }
+
+  input,
+  select {
+    padding: 10px 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-box"><img src="/assets/logo.png" alt="Bahiran Delivery Driver Registration" class="logo-img"></div>
+  <div class="header-text">
+    <h1>Bahiran Delivery Driver Registration</h1>
+    <p data-key="headerSub">Official Motor Driver Registration Portal</p>
+  </div>
+  <div class="lang-switcher">
+    <button class="lang-btn" onclick="setLang('en')" id="btnEn">
+      <span class="flag">🇺🇸</span><span class="lang-label">EN</span>
+    </button>
+    <button class="lang-btn active" onclick="setLang('am')" id="btnAm">
+      <span class="flag">🇪🇹</span><span class="lang-label">አማ</span>
+    </button>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h2><span data-key="heroTitle">Register Your <span>Motor</span><br>Driver Profile</span></h2>
+    <p data-key="heroSub">Complete all required fields to register as an official motor driver. All documents will be verified within 2–3 business days.</p>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps" style="animation: fadeUp .5s .05s ease both">
+    <div class="step active" id="step1">
+      <div class="step-dot">1</div>
+      <span data-key="step1">Personal</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2">
+      <div class="step-dot">2</div>
+      <span data-key="step2">Vehicle</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3">
+      <div class="step-dot">3</div>
+      <span data-key="step3">Documents</span>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card" id="formCard">
+  <form id="regForm" novalidate>
+    <div class="server-error-box" id="serverErrorBox" role="alert" aria-live="polite" style="display:none">
+      <span class="server-error-icon">⚠</span>
+      <span class="server-error-text" id="serverErrorText"></span>
+    </div>
+
+    <!-- SECTION 1: Personal Info -->
+    <div class="section-title">
+      <div class="section-num">1</div>
+      <span data-key="sec1">Personal Information</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="field" id="f-firstname">
+        <label><span data-key="lblFirstName">First Name</span> <span class="req">*</span></label>
+        <input type="text" id="firstname" placeholder="e.g. Abebe" maxlength="50">
+        <span class="err-msg">⚠ First name is required</span>
+      </div>
+      <div class="field" id="f-lastname">
+        <label><span data-key="lblLastName">Last Name</span> <span class="req">*</span></label>
+        <input type="text" id="lastname" placeholder="e.g. Kebede" maxlength="50">
+        <span class="err-msg">⚠ Last name is required</span>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="field" id="f-phone">
+        <label><span data-key="lblPhone">Phone Number</span> <span class="req">*</span></label>
+        <div class="phone-wrap">
+          <div class="phone-prefix">+251</div>
+          <input type="tel" id="phone" placeholder="09XXXXXXXX" maxlength="10" oninput="formatPhone(this)">
+        </div>
+        <span class="err-msg">⚠ Enter valid phone: 09XXXXXXXX (10 digits)</span>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Select Transport Type -->
+    <div class="section-title">
+      <div class="section-num">2</div>
+      <span data-key="secTransport">Select Transport Type</span>
+    </div>
+
+    <div class="transport-type-wrap">
+      <input type="hidden" id="transport_type" name="transport_type" value="">
+      <div class="transport-options">
+        <button type="button" class="transport-opt" id="opt-car" data-type="car" onclick="selectTransport('car')">
+          <span class="transport-check" aria-hidden="true">✓</span>
+          <span class="transport-icon">🚗</span>
+          <span class="transport-label" data-key="transportCar">Car</span>
+        </button>
+        <button type="button" class="transport-opt" id="opt-motor" data-type="motor" onclick="selectTransport('motor')">
+          <span class="transport-check" aria-hidden="true">✓</span>
+          <span class="transport-icon">🏍</span>
+          <span class="transport-label" data-key="transportMotor">Motor</span>
+        </button>
+        <button type="button" class="transport-opt" id="opt-bike" data-type="bike" onclick="selectTransport('bike')">
+          <span class="transport-check" aria-hidden="true">✓</span>
+          <span class="transport-icon">🚲</span>
+          <span class="transport-label" data-key="transportBike">Bicycles</span>
+        </button>
+      </div>
+      <span class="err-msg" id="err-transport">⚠ Select transport type (Car, Motor or Bicycles)</span>
+    </div>
+
+    <!-- SECTION 2b: Vehicle Info (shown after transport type selected) -->
+    <div class="vehicle-details-wrap" id="vehicleDetailsWrap" style="display:none">
+      <div class="section-title">
+        <div class="section-num">2b</div>
+        <span id="vehicleSectionLabel" data-key="sec2">Vehicle Information</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="field" id="f-brand">
+          <label><span id="lblBrandText" data-key="lblBrand">Motor Brand</span> <span class="req">*</span></label>
+          <select id="brand">
+            <option value="">Select brand...</option>
+            <!-- Options filled by JS based on transport_type -->
+          </select>
+          <span class="err-msg">⚠ Select brand</span>
+        </div>
+        <div class="field" id="f-year">
+          <label><span data-key="lblYear">Manufacture Year</span> <span class="req">*</span></label>
+          <select id="year">
+            <option value="">Select year...</option>
+          </select>
+          <span class="err-msg">⚠ Select manufacture year</span>
+        </div>
+      </div>
+
+      <!-- Plate Number -->
+      <div style="margin-top:14px">
+        <div class="section-title" style="margin-top:20px">
+          <div class="section-num">🔢</div>
+          <span data-key="secPlate">Plate Number</span>
+        </div>
+
+        <div class="grid-3">
+          <div class="field" id="f-platecode">
+            <label><span data-key="lblRegionCode">Region Code</span> <span class="req">*</span></label>
+            <select id="platecode" onchange="fillPlateLetterFromRegion(); updatePlate();">
+              <option value="">Code...</option>
+              <option value="1">1 — Addis Ababa</option>
+              <option value="2">2 — Oromia</option>
+              <option value="3">3 — Amhara</option>
+              <option value="4">4 — SNNPR</option>
+              <option value="5">5 — Tigray</option>
+              <option value="6">6 — Somali</option>
+              <option value="7">7 — Afar</option>
+              <option value="8">8 — Benishangul</option>
+              <option value="9">9 — Gambela</option>
+              <option value="10">10 — Harari</option>
+            </select>
+            <span class="err-msg">⚠ Select region code</span>
+          </div>
+          <div class="field" id="f-plateletter">
+            <label><span data-key="lblLetters">Letters</span> <span class="req">*</span></label>
+            <input type="text" id="plateletter" placeholder="AA" maxlength="3" readonly tabindex="-1" title="Filled from region">
+            <span class="err-msg">⚠ Enter plate letters</span>
+          </div>
+          <div class="field" id="f-platenum">
+            <label><span data-key="lblNumbers">Numbers</span> <span class="req">*</span></label>
+            <input type="text" id="platenum" placeholder="12345" maxlength="5" oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePlate()">
+            <span class="err-msg">⚠ Enter plate numbers</span>
+          </div>
+        </div>
+
+        <!-- Live plate preview -->
+        <div class="plate-preview" id="platePreview">
+          <span id="plateRegion" class="plate-region" style="display:none"></span>
+          <span id="plateFull">— — — — —</span>
+        </div>
+        <div class="plate-eth">🇪🇹 ETHIOPIA</div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Documents -->
+    <div class="section-title" style="margin-top:28px">
+      <div class="section-num">3</div>
+      <span data-key="sec3">Documents &amp; Files</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="field" id="f-licence">
+        <label><span data-key="lblLicence">Driving Licence</span> <span class="req">*</span></label>
+        <div class="upload-box" id="ub-licence">
+          <input type="file" id="licence" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFile(this,'ub-licence','fn-licence')">
+          <div class="upload-preview" id="preview-licence"></div>
+          <div class="upload-icon">🪪</div>
+          <div class="upload-label" data-key="upLicence">Upload Licence</div>
+          <div class="upload-sub">JPG, PNG or PDF</div>
+          <div class="upload-name" id="fn-licence"></div>
+        </div>
+        <span class="err-msg">⚠ Driving licence is required</span>
+      </div>
+      <div class="field" id="f-idcard">
+        <label><span data-key="lblId">ID Card</span> <span class="req">*</span></label>
+        <div class="upload-box" id="ub-idcard">
+          <input type="file" id="idcard" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFile(this,'ub-idcard','fn-idcard')">
+          <div class="upload-preview" id="preview-idcard"></div>
+          <div class="upload-icon">🪪</div>
+          <div class="upload-label" data-key="upId">Upload ID Card</div>
+          <div class="upload-sub">JPG, PNG or PDF</div>
+          <div class="upload-name" id="fn-idcard"></div>
+        </div>
+        <span class="err-msg">⚠ ID card is required</span>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="field" id="f-libre">
+        <label><span data-key="lblLibre">Libre / Vehicle Log Book</span> <span class="req">*</span></label>
+        <div class="upload-box" id="ub-libre">
+          <input type="file" id="libre" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFile(this,'ub-libre','fn-libre')">
+          <div class="upload-preview" id="preview-libre"></div>
+          <div class="upload-icon">📋</div>
+          <div class="upload-label" data-key="upLibre">Upload Libre Document</div>
+          <div class="upload-sub" data-key="upLibreSub">JPG, PNG or PDF — vehicle ownership document</div>
+          <div class="upload-name" id="fn-libre"></div>
+        </div>
+        <span class="err-msg">⚠ Libre document is required</span>
+      </div>
+    </div>
+
+    <!-- TERMS -->
+    <div class="section-title" style="margin-top:28px">
+      <div class="section-num">✓</div>
+      <span data-key="secTerms">Terms &amp; Conditions</span>
+    </div>
+
+    <div class="terms-box">
+      <h4 data-key="termsTitle">Motor Driver Registration Agreement</h4>
+      <p>By registering on this platform, you agree to the following terms and conditions set forth by Bahiran Delivery Driver Registration.</p>
+      <p><strong>1. Accuracy of Information:</strong> All information submitted must be accurate, complete, and truthful. Submitting false information is grounds for immediate disqualification and may result in legal action.</p>
+      <p><strong>2. Document Authenticity:</strong> All uploaded documents (Driving Licence, ID Card, Libre) must be valid, government-issued originals. Forged documents will result in permanent ban and reporting to authorities.</p>
+      <p><strong>3. Data Privacy:</strong> Your personal information will be stored securely and used only for driver verification and operational purposes. We do not share your data with third parties without consent.</p>
+      <p><strong>4. Compliance:</strong> Registered drivers must comply with all Ethiopian traffic laws and regulations at all times while on duty.</p>
+      <p><strong>5. Updates:</strong> You are responsible for keeping your profile information up to date. Expired documents must be renewed within 30 days of expiry.</p>
+      <p><strong>6. Termination:</strong> Bahiran Delivery Driver Registration reserves the right to suspend or terminate any driver account found in violation of these terms.</p>
+      <p>By checking the box below, you confirm you have read, understood, and agree to all terms above.</p>
+    </div>
+
+    <div class="field" id="f-terms">
+      <label class="checkbox-row">
+        <input type="checkbox" id="terms">
+        <span data-key="termsCheck">I have read and agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a> of Bahiran Delivery Driver Registration</span> <span class="req">*</span>
+      </label>
+      <span class="err-msg" style="margin-top:4px">⚠ You must accept the terms to continue</span>
+    </div>
+
+    <!-- SUBMIT -->
+    <button type="submit" class="submit-btn" id="submitBtn">
+      <div class="spinner" id="spinner"></div>
+      <span id="btnText" data-key="btnSubmit">Submit Registration →</span>
+    </button>
+
+  </form>
+  </div>
+
+  <!-- SUCCESS (hidden until submit succeeds) -->
+  <div id="successScreen" style="display:none">
+    <div class="success-icon">✅</div>
+    <h2 data-key="successTitle">Registration Submitted!</h2>
+    <p data-key="successMsg">Your driver profile has been received.<br>We will verify your documents within <strong>2–3 business days</strong>.<br>You will be contacted via your registered phone number.</p>
+    <div class="ref-box" id="refCode">REF-000000</div>
+    <br>
+    <button class="submit-btn" style="max-width:300px;margin:0 auto" onclick="resetForm()">
+      <span data-key="btnReset">Register Another Driver</span>
+    </button>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 Bahiran Delivery Driver Registration · <span data-key="footerRights">All rights reserved</span> · <a href="#" style="color:var(--primary);text-decoration:none" data-key="footerPrivacy">Privacy Policy</a></p>
+  </div>
+
+</div><!-- end wrapper -->
+
+<script>
+// ── Year select ──
+(function() {
+  var sel = document.getElementById('year');
+  var cur = new Date().getFullYear();
+  for (var y = cur; y >= 1990; y--) {
+    var o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    sel.appendChild(o);
+  }
+})();
+
+// ── Phone format ──
+function formatPhone(el) {
+  var v = el.value.replace(/[^0-9]/g, '');
+  if (v.indexOf('251') === 0) v = v.substring(3);
+  if (v.length > 0 && v.length <= 9 && (v[0] === '9' || v[0] === '7'))
+    v = '0' + v;
+  el.value = v.substring(0, 10);
+}
+
+// ── File upload handler (show image preview in box) ──
+function handleFile(input, boxId, nameId) {
+  var box  = document.getElementById(boxId);
+  var name = document.getElementById(nameId);
+  var previewId = 'preview-' + boxId.replace('ub-', '');
+  var previewEl = document.getElementById(previewId);
+  if (box.dataset.previewUrl) {
+    URL.revokeObjectURL(box.dataset.previewUrl);
+    delete box.dataset.previewUrl;
+  }
+  if (!input.files || !input.files[0]) {
+    box.classList.remove('has-file');
+    if (previewEl) previewEl.innerHTML = '';
+    if (name) name.textContent = '';
+    box.querySelector('.upload-icon').textContent = boxId === 'ub-libre' ? '📋' : '🪪';
+    return;
+  }
+  var f = input.files[0];
+  box.classList.add('has-file');
+  name.textContent = f.name.length > 28 ? f.name.substring(0, 25) + '...' : f.name;
+  var field = input.closest('.field');
+  if (field) field.classList.remove('has-error');
+  var isImage = /\.(jpe?g|png)$/i.test(f.name);
+  if (isImage && previewEl) {
+    var url = URL.createObjectURL(f);
+    box.dataset.previewUrl = url;
+    previewEl.innerHTML = '<img src="' + url + '" alt="">';
+    previewEl.style.display = 'block';
+  } else if (previewEl) {
+    previewEl.innerHTML = '';
+    previewEl.style.display = 'none';
+  }
+}
+
+// Transport type: CAR, MOTOR, BIKE — first select, then show vehicle details
+var BRANDS_BY_TYPE = {
+  car:   ['Toyota', 'Nissan', 'Honda', 'Hyundai', 'Kia', 'Isuzu', 'Mitsubishi', 'Ford', 'Other'],
+  motor: ['Honda', 'Bajaj', 'TVS', 'Yamaha', 'Suzuki', 'Hero', 'Lifan', 'Haojue', 'Loncin', 'Other'],
+  bike:  ['Holland', 'Giant', 'Trek', 'Phoenix', 'Mountain', 'Roadmaster', 'Other']
+};
+function selectTransport(type) {
+  var h = document.getElementById('transport_type');
+  h.value = type;
+  document.querySelectorAll('.transport-opt').forEach(function(btn) {
+    btn.classList.toggle('selected', btn.getAttribute('data-type') === type);
+  });
+  var wrap = document.querySelector('.transport-type-wrap');
+  if (wrap) wrap.classList.remove('has-error');
+  var isBike = (type === 'bike');
+  var wrap = document.getElementById('vehicleDetailsWrap');
+  if (wrap) wrap.style.display = isBike ? 'none' : 'block';
+  if (isBike) {
+    document.getElementById('brand').value = '';
+    document.getElementById('year').value = '';
+    document.getElementById('platecode').value = '';
+    document.getElementById('plateletter').value = '';
+    document.getElementById('platenum').value = '';
+    updatePlate();
+    ['brand','year','platecode','plateletter','platenum'].forEach(function(id) {
+      var w = document.getElementById('f-' + id);
+      if (w) w.classList.remove('has-error');
+    });
+  } else {
+    fillBrandOptions(type);
+    updateVehicleSectionLabel(type);
+    document.getElementById('brand').value = '';
+  }
+  toggleDocumentFieldsForBike(isBike);
+  checkSteps();
+}
+function toggleDocumentFieldsForBike(isBike) {
+  var licenceWrap = document.getElementById('f-licence');
+  var libreWrap = document.getElementById('f-libre');
+  if (licenceWrap) licenceWrap.style.display = isBike ? 'none' : '';
+  if (libreWrap) libreWrap.style.display = isBike ? 'none' : '';
+  if (isBike) {
+    document.getElementById('licence').value = '';
+    document.getElementById('libre').value = '';
+    var ubLicence = document.getElementById('ub-licence');
+    var ubLibre = document.getElementById('ub-libre');
+    if (ubLicence) { ubLicence.classList.remove('has-file'); ubLicence.querySelector('.upload-name').textContent = ''; }
+    if (ubLibre) { ubLibre.classList.remove('has-file'); ubLibre.querySelector('.upload-name').textContent = ''; }
+  }
+}
+function fillBrandOptions(type) {
+  var sel = document.getElementById('brand');
+  var opts = BRANDS_BY_TYPE[type] || BRANDS_BY_TYPE.motor;
+  sel.innerHTML = '<option value="">Select brand...</option>';
+  opts.forEach(function(b) {
+    var o = document.createElement('option');
+    o.value = b; o.textContent = b;
+    sel.appendChild(o);
+  });
+}
+function updateVehicleSectionLabel(type) {
+  var t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+  var sectionKeys = { car: 'sec2Car', motor: 'sec2Motor', bike: 'sec2Bike' };
+  var brandKeys = { car: 'lblBrandCar', motor: 'lblBrandMotor', bike: 'lblBrandBike' };
+  var el = document.getElementById('vehicleSectionLabel');
+  var lblBrand = document.getElementById('lblBrandText');
+  if (el) el.textContent = t[sectionKeys[type]] || 'Vehicle Information';
+  if (lblBrand) lblBrand.textContent = t[brandKeys[type]] || 'Brand';
+}
+
+// Region code → plate letters (Ethiopia)
+var REGION_LETTERS = { '1':'AA', '2':'OR', '3':'AM', '4':'SN', '5':'TG', '6':'SM', '7':'AF', '8':'BG', '9':'GB', '10':'HR' };
+function fillPlateLetterFromRegion() {
+  var code = document.getElementById('platecode').value;
+  var letterEl = document.getElementById('plateletter');
+  letterEl.value = REGION_LETTERS[code] || '';
+}
+
+// ── Live plate preview ──
+function updatePlate() {
+  var code   = document.getElementById('platecode').value;
+  var letter = document.getElementById('plateletter').value;
+  var num    = document.getElementById('platenum').value;
+
+  var regionEl = document.getElementById('plateRegion');
+  var fullEl   = document.getElementById('plateFull');
+
+  if (code) {
+    regionEl.style.display = 'inline';
+    regionEl.textContent   = code;
+  } else {
+    regionEl.style.display = 'none';
+  }
+
+  var parts = [];
+  if (letter) parts.push(letter);
+  if (num)    parts.push(num);
+  fullEl.textContent = parts.length ? parts.join(' ') : '— — — — —';
+}
+
+// ── Validation ──
+function validateField(id, checkFn) {
+  var wrapper = document.getElementById('f-' + id);
+  var ok = checkFn();
+  if (ok) {
+    wrapper.classList.remove('has-error');
+  } else {
+    wrapper.classList.add('has-error');
+  }
+  return ok;
+}
+
+function validate() {
+  var ok = true;
+
+  ok = validateField('firstname', function() {
+    return document.getElementById('firstname').value.trim().length >= 2;
+  }) && ok;
+
+  ok = validateField('lastname', function() {
+    return document.getElementById('lastname').value.trim().length >= 2;
+  }) && ok;
+
+  ok = validateField('phone', function() {
+    var v = document.getElementById('phone').value.replace(/\D/g, '');
+    if (v.indexOf('251') === 0) v = v.substring(3);
+    return /^0?[79]\d{8}$/.test(v);
+  }) && ok;
+
+  var transport = (document.getElementById('transport_type').value || '').toLowerCase();
+  var transportWrap = document.querySelector('.transport-type-wrap');
+  if (transport !== 'car' && transport !== 'motor' && transport !== 'bike') {
+    if (transportWrap) { transportWrap.classList.add('has-error'); }
+    ok = false;
+  } else {
+    if (transportWrap) transportWrap.classList.remove('has-error');
+  }
+
+  var isBike = (document.getElementById('transport_type').value || '').toLowerCase() === 'bike';
+  if (!isBike) {
+    ok = validateField('brand', function() {
+      return document.getElementById('brand').value !== '';
+    }) && ok;
+    ok = validateField('year', function() {
+      return document.getElementById('year').value !== '';
+    }) && ok;
+    ok = validateField('platecode', function() {
+      return document.getElementById('platecode').value !== '';
+    }) && ok;
+    ok = validateField('plateletter', function() {
+      return document.getElementById('plateletter').value.trim().length >= 1;
+    }) && ok;
+    ok = validateField('platenum', function() {
+      return document.getElementById('platenum').value.trim().length >= 1;
+    }) && ok;
+  }
+  if (!isBike) {
+    ok = validateField('licence', function() {
+      return document.getElementById('licence').files.length > 0;
+    }) && ok;
+  }
+  ok = validateField('idcard', function() {
+    return document.getElementById('idcard').files.length > 0;
+  }) && ok;
+  if (!isBike) {
+    ok = validateField('libre', function() {
+      return document.getElementById('libre').files.length > 0;
+    }) && ok;
+  }
+
+  ok = validateField('terms', function() {
+    return document.getElementById('terms').checked;
+  }) && ok;
+
+  return ok;
+}
+
+// ── Steps indicator ──
+function setStep(n) {
+  for (var i = 1; i <= 3; i++) {
+    var el = document.getElementById('step' + i);
+    el.classList.remove('active', 'done');
+    if (i < n)  el.classList.add('done');
+    if (i === n) el.classList.add('active');
+  }
+  for (var j = 1; j <= 2; j++) {
+    var line = document.getElementById('line' + j);
+    line.classList.toggle('done', j < n);
+  }
+}
+
+// Watch fields to update step
+document.getElementById('firstname').addEventListener('input', checkSteps);
+document.getElementById('lastname').addEventListener('input', checkSteps);
+document.getElementById('phone').addEventListener('input', function() {
+  checkSteps();
+  var v = document.getElementById('phone').value.replace(/\D/g, '');
+  if (v.indexOf('251') === 0) v = v.substring(3);
+  if (/^0?[79]\d{8}$/.test(v)) document.getElementById('f-phone').classList.remove('has-error');
+});
+document.getElementById('brand').addEventListener('change', checkSteps);
+document.getElementById('year').addEventListener('change', checkSteps);
+document.getElementById('platecode').addEventListener('change', checkSteps);
+document.getElementById('platenum').addEventListener('input', checkSteps);
+document.getElementById('licence').addEventListener('change', checkSteps);
+document.getElementById('idcard').addEventListener('change', checkSteps);
+document.getElementById('libre').addEventListener('change', checkSteps);
+
+function checkSteps() {
+  var fn = document.getElementById('firstname').value.trim();
+  var ln = document.getElementById('lastname').value.trim();
+  var ph = document.getElementById('phone').value.replace(/\D/g, '');
+  if (ph.indexOf('251') === 0) ph = ph.substring(3);
+  var s1done = fn.length >= 2 && ln.length >= 2 && /^0?[79]\d{8}$/.test(ph);
+
+  var transport = (document.getElementById('transport_type').value || '').toLowerCase();
+  var br = document.getElementById('brand').value;
+  var yr = document.getElementById('year').value;
+  var pc = document.getElementById('platecode').value;
+  var pl = document.getElementById('plateletter').value.trim();
+  var pn = document.getElementById('platenum').value.trim();
+  var vehicleDone = (transport === 'bike') || (br && yr && pc && pl.length >= 1 && pn.length >= 1);
+  var s2done = s1done && (transport === 'car' || transport === 'motor' || transport === 'bike') && vehicleDone;
+
+  var isBike = (document.getElementById('transport_type').value || '').toLowerCase() === 'bike';
+  var lc = isBike ? true : document.getElementById('licence').files.length > 0;
+  var id = document.getElementById('idcard').files.length > 0;
+  var lb = isBike ? true : document.getElementById('libre').files.length > 0;
+  var s3done = s2done && lc && id && lb;
+
+  if (s3done) setStep(3);
+  else if (s2done) setStep(3);
+  else if (s1done) setStep(2);
+  else setStep(1);
+}
+
+// ── Submit ──
+document.getElementById('regForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  if (!validate()) {
+    // Scroll to first error
+    var first = document.querySelector('.has-error');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // Hide any previous server error
+  var serverErrorBox = document.getElementById('serverErrorBox');
+  var serverErrorText = document.getElementById('serverErrorText');
+  if (serverErrorBox) { serverErrorBox.style.display = 'none'; }
+
+  // Show spinner
+  var btn = document.getElementById('submitBtn');
+  var sp  = document.getElementById('spinner');
+  var txt = document.getElementById('btnText');
+  btn.disabled = true;
+  sp.style.display = 'block';
+  txt.textContent = 'Submitting...';
+
+  // Build FormData
+  var fd = new FormData();
+  fd.append('firstname',   document.getElementById('firstname').value.trim());
+  fd.append('lastname',    document.getElementById('lastname').value.trim());
+  (function() {
+    var p = document.getElementById('phone').value.replace(/\D/g, '');
+    if (p.indexOf('251') === 0) p = p.substring(3);
+    if (p.length === 10 && p[0] === '0') p = p.substring(1);
+    fd.append('phone', '+251' + p);
+  })();
+  var transport = (document.getElementById('transport_type').value || 'motor').toLowerCase();
+  fd.append('transport_type', transport);
+  if (transport === 'bike') {
+    fd.append('brand', '');
+    fd.append('year', '');
+    fd.append('platecode', '');
+    fd.append('plateletter', '');
+    fd.append('platenum', '');
+  } else {
+    fd.append('brand',       document.getElementById('brand').value);
+    fd.append('year',        document.getElementById('year').value);
+    fd.append('platecode',   document.getElementById('platecode').value);
+    fd.append('plateletter', document.getElementById('plateletter').value.trim());
+    fd.append('platenum',    document.getElementById('platenum').value.trim());
+  }
+  if (transport !== 'bike') {
+    fd.append('licence',   document.getElementById('licence').files[0]);
+    fd.append('libre',     document.getElementById('libre').files[0]);
+  }
+  fd.append('idcard',      document.getElementById('idcard').files[0]);
+
+  fetch('/register', {
+    method: 'POST',
+    body: fd
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      btn.disabled = false;
+      sp.style.display = 'none';
+      txt.textContent = 'Submit Registration →';
+      if (serverErrorBox) serverErrorBox.style.display = 'none';
+      document.getElementById('formCard').style.display = 'none';
+      document.querySelector('.hero').style.display = 'none';
+      document.querySelector('.steps').style.display = 'none';
+      document.getElementById('refCode').textContent = data.ref || 'REF-' + Math.floor(Math.random()*900000+100000);
+      document.getElementById('successScreen').style.display = 'block';
+      setStep(3);
+    } else {
+      var msg = data.message || 'Submission failed. Please try again.';
+      if (serverErrorBox && serverErrorText) {
+        serverErrorText.textContent = msg;
+        serverErrorBox.style.display = 'flex';
+        serverErrorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        alert('Error: ' + msg);
+      }
+      btn.disabled = false;
+      sp.style.display = 'none';
+      txt.textContent = 'Submit Registration →';
+    }
+  })
+  .catch(function() {
+    if (serverErrorBox && serverErrorText) {
+      serverErrorText.textContent = 'Could not connect to server. Please check your connection and try again.';
+      serverErrorBox.style.display = 'flex';
+      serverErrorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      alert('Could not connect to server. Please check your connection and try again.');
+    }
+    btn.disabled = false;
+    sp.style.display = 'none';
+    txt.textContent = 'Submit Registration →';
+  });
+});
+
+// ── Reset ──
+function resetForm() {
+  document.getElementById('regForm').reset();
+  document.getElementById('formCard').style.display = 'block';
+  document.querySelector('.hero').style.display = 'block';
+  document.querySelector('.steps').style.display = 'flex';
+  document.getElementById('successScreen').style.display = 'none';
+  var errBox = document.getElementById('serverErrorBox');
+  if (errBox) errBox.style.display = 'none';
+  document.querySelectorAll('.has-error').forEach(function(el) { el.classList.remove('has-error'); });
+  var tw = document.querySelector('.transport-type-wrap');
+  if (tw) { tw.classList.remove('has-error'); }
+  document.getElementById('transport_type').value = '';
+  document.querySelectorAll('.transport-opt').forEach(function(btn) { btn.classList.remove('selected'); });
+  document.getElementById('vehicleDetailsWrap').style.display = 'none';
+  toggleDocumentFieldsForBike(false);
+  document.querySelectorAll('.upload-box').forEach(function(box) {
+    box.classList.remove('has-file');
+    if (box.dataset.previewUrl) {
+      URL.revokeObjectURL(box.dataset.previewUrl);
+      delete box.dataset.previewUrl;
+    }
+    var pid = 'preview-' + box.id.replace('ub-', '');
+    var p = document.getElementById(pid);
+    if (p) { p.innerHTML = ''; p.style.display = 'none'; }
+    box.querySelector('.upload-icon').textContent = box.id === 'ub-libre' ? '📋' : '🪪';
+  });
+  document.querySelectorAll('.upload-name').forEach(function(el) { el.textContent = ''; });
+  fillPlateLetterFromRegion();
+  updatePlate();
+  document.getElementById('plateFull').textContent = '— — — — —';
+  document.getElementById('plateRegion').style.display = 'none';
+  setStep(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+<script>
+// ════════════════════════════════════════════
+//  LANGUAGE SWITCHER — English / Amharic
+// ════════════════════════════════════════════
+var TRANSLATIONS = {
+  en: {
+    headerSub:    'Official Motor Driver Registration Portal',
+    heroBadge:    'Ethiopia Driver Registry',
+    heroTitle:    'Register Your <span>Motor</span><br>Driver Profile',
+    heroSub:      'Complete all required fields to register as an official motor driver. All documents will be verified within 2–3 business days.',
+    step1:        'Personal',
+    step2:        'Vehicle',
+    step3:        'Documents',
+    sec1:         'Personal Information',
+    secTransport: 'Select Transport Type',
+    transportCar: 'Car',
+    transportMotor: 'Motor',
+    transportBike: 'Bicycles',
+    lblFirstName: 'First Name',
+    lblLastName:  'Last Name',
+    lblPhone:     'Phone Number',
+    sec2:         'Vehicle Information',
+    sec2Car:      'Car Information',
+    sec2Motor:    'Motor Information',
+    sec2Bike:     'Bicycles Information',
+    lblBrand:     'Motor Brand',
+    lblBrandCar:  'Car Brand',
+    lblBrandMotor:'Motor Brand',
+    lblBrandBike: 'Bicycles Brand',
+    lblYear:      'Manufacture Year',
+    secPlate:     'Plate Number',
+    lblRegionCode:'Region Code',
+    lblLetters:   'Letters',
+    lblNumbers:   'Numbers',
+    sec3:         'Documents & Files',
+    lblLicence:   'Driving Licence',
+    lblId:        'ID Card',
+    lblLibre:     'Libre / Vehicle Log Book',
+    upLicence:    'Upload Licence',
+    upId:         'Upload ID Card',
+    upLibre:      'Upload Libre Document',
+    upLibreSub:   'JPG, PNG or PDF — vehicle ownership document',
+    secTerms:     'Terms & Conditions',
+    termsTitle:   'Motor Driver Registration Agreement',
+    termsCheck:   'I have read and agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a> of Bahiran Delivery Driver Registration',
+    btnSubmit:    'Submit Registration →',
+    successTitle: 'Registration Submitted!',
+    successMsg:   'Your driver profile has been received.<br>We will verify your documents within <strong>2–3 business days</strong>.<br>You will be contacted via your registered phone number.',
+    btnReset:     'Register Another Driver',
+    footerRights: 'All rights reserved',
+    footerPrivacy:'Privacy Policy',
+    // Placeholders
+    phFirstName:  'e.g. Abebe',
+    phLastName:   'e.g. Kebede',
+    phPhone:      '09XXXXXXXX',
+    phLetters:    'AA',
+    phNumbers:    '12345',
+    // Select default options
+    selBrand:     'Select brand...',
+    selYear:      'Select year...',
+    selCode:      'Code...',
+    // Error messages
+    errFirstName: '⚠ First name is required',
+    errLastName:  '⚠ Last name is required',
+    errPhone:     '⚠ Enter a valid phone (09XXXXXXXX, 10 digits)',
+    errBrand:     '⚠ Select motor brand',
+    errYear:      '⚠ Select manufacture year',
+    errPlateCode: '⚠ Select region code',
+    errLetter:    '⚠ Enter plate letters',
+    errPlateNum:  '⚠ Enter plate numbers',
+    errLicence:   '⚠ Driving licence is required',
+    errId:        '⚠ ID card is required',
+    errLibre:     '⚠ Libre document is required',
+    errTerms:     '⚠ You must accept the terms to continue',
+    // Submit states
+    submitting:   'Submitting...',
+    // Terms body
+    termsBody: '<h4 data-key="termsTitle">Motor Driver Registration Agreement</h4><p>By registering on this platform, you agree to the following terms and conditions set forth by Bahiran Delivery Driver Registration.</p><p><strong>1. Accuracy of Information:</strong> All information submitted must be accurate, complete, and truthful. Submitting false information is grounds for immediate disqualification and may result in legal action.</p><p><strong>2. Document Authenticity:</strong> All uploaded documents (Driving Licence, ID Card, Libre) must be valid, government-issued originals. Forged documents will result in permanent ban and reporting to authorities.</p><p><strong>3. Data Privacy:</strong> Your personal information will be stored securely and used only for driver verification and operational purposes. We do not share your data with third parties without consent.</p><p><strong>4. Compliance:</strong> Registered drivers must comply with all Ethiopian traffic laws and regulations at all times while on duty.</p><p><strong>5. Updates:</strong> You are responsible for keeping your profile information up to date. Expired documents must be renewed within 30 days of expiry.</p><p><strong>6. Termination:</strong> Bahiran Delivery Driver Registration reserves the right to suspend or terminate any driver account found in violation of these terms.</p><p>By checking the box below, you confirm you have read, understood, and agree to all terms above.</p>'
+  },
+  am: {
+    headerSub:    'ኦፊሴላዊ የሞተር ሾፌር ምዝገባ ፖርታል',
+    heroBadge:    'የኢትዮጵያ ሾፌር መዝገብ',
+    heroTitle:    'የሞተር ሾፌር <span>መገለጫ</span><br>ይመዝገቡ',
+    heroSub:      'እንደ ኦፊሴላዊ ሞተር ሾፌር ለመመዝገብ ሁሉንም አስፈላጊ መረጃዎች ይሙሉ። ሁሉም ሰነዶች በ2–3 የሥራ ቀናት ውስጥ ይረጋገጣሉ።',
+    step1:        'የግል መረጃ',
+    step2:        'ተሽከርካሪ',
+    step3:        'ሰነዶች',
+    sec1:         'የግል መረጃ',
+    secTransport: 'የትራንስፖርት አይነት ይምረጡ',
+    transportCar: 'መኪና',
+    transportMotor: 'ሞተር',
+    transportBike: 'ብስክሌቶች',
+    lblFirstName: 'የመጀመሪያ ስም',
+    lblLastName:  'የአባት ስም',
+    lblPhone:     'ስልክ ቁጥር',
+    sec2:         'የተሽከርካሪ መረጃ',
+    sec2Car:      'የመኪና መረጃ',
+    sec2Motor:    'የሞተር መረጃ',
+    sec2Bike:     'የብስክሌቶች መረጃ',
+    lblBrand:     'የሞተር ብራንድ',
+    lblBrandCar:  'የመኪና ብራንድ',
+    lblBrandMotor:'የሞተር ብራንድ',
+    lblBrandBike: 'የብስክሌቶች ብራንድ',
+    lblYear:      'የምርት ዓመት',
+    secPlate:     'ታርጋ ቁጥር',
+    lblRegionCode:'የክልል ኮድ',
+    lblLetters:   'ፊደላት',
+    lblNumbers:   'ቁጥሮች',
+    sec3:         'ሰነዶች እና ፋይሎች',
+    lblLicence:   'የሹፌር ፍቃድ',
+    lblId:        'መታወቂያ ካርድ',
+    lblLibre:     'ሊብሬ / የተሽከርካሪ ሰነድ',
+    upLicence:    'ፍቃድ ይጫኑ',
+    upId:         'መታወቂያ ይጫኑ',
+    upLibre:      'ሊብሬ ሰነድ ይጫኑ',
+    upLibreSub:   'JPG፣ PNG ወይም PDF — የተሽከርካሪ ባለቤትነት ሰነድ',
+    secTerms:     'ውሎች እና ሁኔታዎች',
+    termsTitle:   'የሞተር ሾፌር ምዝገባ ስምምነት',
+    termsCheck:   'የ<a href="#">ውሎች እና ሁኔታዎች</a>ን እና የ<a href="#">ግላዊነት ፖሊሲ</a>ን አንብቤ ተስማምቻለሁ',
+    btnSubmit:    'ምዝገባ ያስገቡ →',
+    successTitle: 'ምዝገባ ተቀብሏል!',
+    successMsg:   'የሹፌር መገለጫዎ ተቀብሏል።<br>ሰነዶችዎ በ<strong>2–3 የሥራ ቀናት</strong> ውስጥ ይረጋገጣሉ።<br>በተመዘገበ ስልክ ቁጥርዎ ይገናኛሉ።',
+    btnReset:     'ሌላ ሾፌር ይመዝገቡ',
+    footerRights: 'መብቶች የተጠበቁ ናቸው',
+    footerPrivacy:'የግላዊነት ፖሊሲ',
+    // Placeholders
+    phFirstName:  'ለምሳሌ፡ አበበ',
+    phLastName:   'ለምሳሌ፡ ከበደ',
+    phPhone:      '09XXXXXXXX',
+    phLetters:    'AA',
+    phNumbers:    '12345',
+    selBrand:     'ብራንድ ይምረጡ...',
+    selYear:      'ዓመት ይምረጡ...',
+    selCode:      'ኮድ...',
+    // Error messages
+    errFirstName: '⚠ የመጀመሪያ ስም ያስፈልጋል',
+    errLastName:  '⚠ የአባት ስም ያስፈልጋል',
+    errPhone:     '⚠ ትክክለኛ ስልክ ቁጥር ያስፈልጋል (09XXXXXXXX)',
+    errBrand:     '⚠ የሞተር ብራንድ ይምረጡ',
+    errYear:      '⚠ የምርት ዓመት ይምረጡ',
+    errPlateCode: '⚠ የክልል ኮድ ይምረጡ',
+    errLetter:    '⚠ የታርጋ ፊደላት ያስፈልጋሉ',
+    errPlateNum:  '⚠ የታርጋ ቁጥሮች ያስፈልጋሉ',
+    errLicence:   '⚠ የሹፌር ፍቃድ ያስፈልጋል',
+    errId:        '⚠ መታወቂያ ካርድ ያስፈልጋል',
+    errLibre:     '⚠ ሊብሬ ሰነድ ያስፈልጋል',
+    errTerms:     '⚠ ለቀጠል ውሎቹን መቀበል ይኖርብዎታል',
+    submitting:   'እያስገቡ ነው...',
+    termsBody: '<h4>የሞተር ሾፌር ምዝገባ ስምምነት</h4><p>በዚህ መድረክ ላይ በመመዝገብ፣ Bahiran Delivery Driver Registration ያዘጋጁትን የሚከተሉትን ውሎች እና ሁኔታዎች ተቀብለዋል።</p><p><strong>1. የመረጃ ትክክለኛነት፡</strong> የቀረበ ሁሉም መረጃ ትክክለኛ፣ ሙሉ እና እውነተኛ መሆን አለበት። የሐሰት መረጃ ማቅረብ ወዲያውኑ ለማስወጣት መሠረት ሲሆን ሕጋዊ እርምጃ ሊያስከትል ይችላል።</p><p><strong>2. የሰነድ ትክክለኛነት፡</strong> የተጫኑ ሁሉም ሰነዶች (ሹፌር ፍቃድ፣ መታወቂያ፣ ሊብሬ) ትክክለኛ የመንግሥት ዋና ሰነዶች መሆን አለባቸው። የሐሰት ሰነዶች ቋሚ ማገድ እና ለሥልጣን ባለስልጣናት ሪፖርት ያስከትላሉ።</p><p><strong>3. የውሂብ ግላዊነት፡</strong> የግልዎ መረጃ በጥንቃቄ ተቀምጦ ለሹፌር ማረጋገጫ እና ስራዊ ዓላማዎች ብቻ ጥቅም ላይ ይውላል። ያለ ፈቃድዎ ለሦስተኛ ወገን አናጋጥምም።</p><p><strong>4. ተገዥነት፡</strong> የተመዘገቡ ሹፌሮች በአገልግሎት ላይ ሳሉ ሁሌም ሁሉንም የኢትዮጵያ ትራፊክ ሕጎች እና ደንቦች ማክበር አለባቸው።</p><p><strong>5. ዝማኔዎች፡</strong> የመገለጫ መረጃዎን ወቅታዊ ማድረግ ሃላፊነትዎ ነው። የጊዜ ማለፋቸው ሰነዶች በ30 ቀናት ውስጥ መታደስ አለባቸው።</p><p><strong>6. መቋረጥ፡</strong> Bahiran Delivery Driver Registration ከእነዚህ ውሎች ጋር ተቃርኖ ያለ ማንኛውም የሹፌር መለያ ለማገድ ወይም ለመዝጋት መብቱ የተጠበቀ ነው።</p><p>ከዚህ በታች ያለውን ሳጥን በማረጋገጥ ሁሉንም ውሎቹን አንብቤ፣ ተረድቼ እና ተስማምቻለሁ ብለው ያረጋግጣሉ።</p>'
+  }
+};
+
+var currentLang = 'am';
+
+// Error message element map
+var ERR_KEYS = {
+  'firstname':  'errFirstName',
+  'lastname':   'errLastName',
+  'phone':      'errPhone',
+  'brand':      'errBrand',
+  'year':       'errYear',
+  'platecode':  'errPlateCode',
+  'plateletter':'errLetter',
+  'platenum':   'errPlateNum',
+  'licence':    'errLicence',
+  'idcard':     'errId',
+  'libre':      'errLibre',
+  'terms':      'errTerms'
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  var t = TRANSLATIONS[lang];
+
+  // Toggle button states
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('btnAm').classList.toggle('active', lang === 'am');
+
+  // Toggle Amharic font class on html element
+  document.documentElement.classList.toggle('lang-am', lang === 'am');
+
+  // Update all data-key elements
+  var els = document.querySelectorAll('[data-key]');
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    var key = el.getAttribute('data-key');
+    if (t[key] !== undefined) {
+      el.innerHTML = t[key];
+    }
+  }
+
+  // Update placeholders
+  document.getElementById('firstname').placeholder  = t.phFirstName;
+  document.getElementById('lastname').placeholder   = t.phLastName;
+  document.getElementById('phone').placeholder      = t.phPhone;
+  document.getElementById('plateletter').placeholder = t.phLetters;
+  document.getElementById('platenum').placeholder   = t.phNumbers;
+
+  // Update select default options
+  document.getElementById('brand').options[0].text    = t.selBrand;
+  document.getElementById('year').options[0].text     = t.selYear;
+  document.getElementById('platecode').options[0].text = t.selCode;
+
+  // Update all error messages
+  for (var fieldId in ERR_KEYS) {
+    var field = document.getElementById('f-' + fieldId);
+    if (field) {
+      var errEl = field.querySelector('.err-msg');
+      if (errEl && t[ERR_KEYS[fieldId]]) {
+        errEl.innerHTML = t[ERR_KEYS[fieldId]];
+      }
+    }
+  }
+
+  // Update terms box
+  var termsBox = document.querySelector('.terms-box');
+  if (termsBox && t.termsBody) { termsBox.innerHTML = t.termsBody; }
+
+  // Update submit button text (only if not mid-submit)
+  var btnText = document.getElementById('btnText');
+  if (btnText && !document.getElementById('submitBtn').disabled) {
+    btnText.innerHTML = t.btnSubmit;
+  }
+
+  // Update document title
+  document.title = lang === 'am' ? 'የሞተር ሾፌር ምዝገባ' : 'Motor Driver Registration';
+  document.documentElement.setAttribute('lang', lang === 'am' ? 'am' : 'en');
+  // Refresh vehicle section label if transport already selected
+  var tt = document.getElementById('transport_type');
+  if (tt && tt.value) updateVehicleSectionLabel(tt.value);
+}
+
+// Default to Amharic on load
+setLang('am');
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /*
- * MotoReg Ethiopia - Motor Driver Registration
+ * Bahiran Delivery Driver Registration - Motor Driver Registration
  * Black & white, Metropolis, pro & fast
  */
 @import url("https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/metropolis.min.css");
@@ -230,6 +230,61 @@ body {
   flex-shrink: 0;
 }
 
+/* Transport type selection */
+.transport-type-wrap {
+  margin-top: 8px;
+}
+.transport-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.transport-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.transport-opt:hover {
+  border-color: var(--border-focus);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.transport-opt.selected {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(17,17,17,.12);
+}
+.transport-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+.transport-type-wrap .err-msg {
+  display: block;
+  margin-top: 8px;
+}
+.transport-type-wrap:not(.has-error) .err-msg { display: none; }
+.transport-type-wrap.has-error .err-msg { display: block; }
+.vehicle-details-wrap {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 560px) {
+  .transport-options { grid-template-columns: 1fr; }
+}
+
 /* Grid — aligned fields */
 .grid-2 {
   display: grid;
@@ -366,6 +421,30 @@ select {
 
 .field.has-error .err-msg {
   display: block;
+}
+
+/* Server / duplicate registration error (red) */
+.server-error-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  color: #b91c1c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.server-error-box .server-error-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  color: #b91c1c;
+}
+.server-error-box .server-error-text {
+  flex: 1;
+  color: #b91c1c;
 }
 
 /* Upload box */

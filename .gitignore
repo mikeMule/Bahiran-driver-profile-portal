@@ -1,13 +1,54 @@
+# Environment and secrets
 .env
 .env.local
+.env.*.local
+*.env
+
+# Python
 .venv/
+venv/
+env/
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Uploads and generated data
 uploads/
 *.log
-service-account*.json
+registrations.json
 admin_users.json
 
-# Project setup / generated
+# Credentials (never commit)
+service-account*.json
+*.pem
+
+# Project setup / generated (do not commit)
 cursor_project_file_structure_setup.md
 embed_logo.py
+
+# Migrations (ignore local migration output folder if used)
+migration/
+
+# IDE and OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
