@@ -8,4 +8,4 @@ cmds = ["python3 -m pip install --upgrade pip", "python3 -m pip install -r requi
 cmds = []
 
 [start]
-cmd = "python3 server.py"
+cmd = "python3 run.py"
