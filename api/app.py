@@ -39,19 +39,24 @@ MAX_FILE_MB = 5
 ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".pdf"}
 PORT        = int(os.environ.get("PORT", "5050"))
 
-# Supabase (from .env) — URL + key only (no Postgres connection string)
+# Supabase — from .env (SERVICE_* from DevOps / Kong gateway)
 SUPABASE_URL = (
-    os.environ.get("SUPABASE_URL")
+    os.environ.get("SERVICE_URL_SUPABASEKONG")
+    or os.environ.get("SERVICE_URL_SUPABASEKONG_8000")
+    or os.environ.get("SUPABASE_URL")
     or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
     or os.environ.get("EXPO_PUBLIC_SUPABASE_URL")
 )
 SUPABASE_ANON_KEY = (
-    os.environ.get("SUPABASE_ANON_KEY")
+    os.environ.get("SERVICE_SUPABASEANON_KEY")
+    or os.environ.get("SUPABASE_ANON_KEY")
     or os.environ.get("SUPABASE_KEY")
     or os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
     or os.environ.get("EXPO_PUBLIC_SUPABASE_KEY")
 )
-# Optional: direct Postgres URL (if set, used as fallback; Supabase API preferred when URL+key set)
+# Service role key (optional; for admin operations if needed)
+SUPABASE_SERVICE_KEY = os.environ.get("SERVICE_SUPABASESERVICE_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+# PostgreSQL connection (optional; for registrations, admin list, stats)
 SUPABASE_DATABASE_URL = os.environ.get("SUPABASE_DATABASE_URL") or os.environ.get("DATABASE_URL")
 SUPABASE_DATABASE_POOLER_URL = os.environ.get("SUPABASE_DATABASE_POOLER_URL")
 
@@ -345,8 +350,8 @@ def _get_db_url_with_ssl(url_raw):
     url = _strip_unsupported_query_params(url)
     if "sslmode=" in url:
         return url
-    # Only force SSL for Supabase cloud; self-hosted (e.g. 187.77.12.130) often uses no SSL
-    if ".supabase.co" in url:
+    # Force SSL for Supabase (cloud or bahirandelivery); self-hosted IPs often use no SSL
+    if ".supabase.co" in url or "bahirandelivery.cloud" in url:
         sep = "&" if "?" in url else "?"
         url = url + sep + "sslmode=require"
     return url
@@ -366,8 +371,8 @@ def get_db_connection():
         u = _get_db_url_with_ssl(SUPABASE_DATABASE_URL)
         if u:
             urls_to_try.append(u)
-            # If direct host (db.xxx.supabase.co), also try port 6543 (transaction pooler)
-            if "db." in u and ".supabase.co" in u and ":5432" in u:
+            # If Supabase host, also try port 6543 (transaction pooler) when 5432 is used
+            if ":5432" in u and (".supabase.co" in u or "bahirandelivery.cloud" in u):
                 u6543 = _direct_url_with_port(u, 6543)
                 if u6543 not in urls_to_try:
                     urls_to_try.append(u6543)
