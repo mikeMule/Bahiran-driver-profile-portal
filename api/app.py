@@ -1258,6 +1258,109 @@ def admin_serve_file(storage_path):
                     headers={"Cache-Control": "private, max-age=3600"})
 
 
+@app.route("/admin/download-sql", methods=["GET"])
+@admin_required
+def admin_download_sql():
+    """Generate a full SQL dump: CREATE TABLE + INSERT INTO for every row."""
+    import io
+    from datetime import datetime, timezone
+    from flask import Response
+
+    db = load_db_registrations() or []
+
+    lines = []
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    # ── Header comment ──────────────────────────────────────────────────
+    lines.append("-- ============================================================")
+    lines.append("--  Bahiran Driver Profile — SQL Backup")
+    lines.append(f"--  Generated : {now}")
+    lines.append(f"--  Records   : {len(db)}")
+    lines.append("--  Schema    : bahiran_driver")
+    lines.append("--  Table     : registrations")
+    lines.append("-- ============================================================")
+    lines.append("")
+
+    # ── Schema + Table ──────────────────────────────────────────────────
+    lines.append("CREATE SCHEMA IF NOT EXISTS bahiran_driver;")
+    lines.append("")
+    lines.append("CREATE TABLE IF NOT EXISTS bahiran_driver.registrations (")
+    lines.append("    id             TEXT        PRIMARY KEY,")
+    lines.append("    ref            TEXT        UNIQUE NOT NULL,")
+    lines.append("    firstname      TEXT        NOT NULL DEFAULT '',")
+    lines.append("    lastname       TEXT        NOT NULL DEFAULT '',")
+    lines.append("    fullname       TEXT        NOT NULL DEFAULT '',")
+    lines.append("    phone          TEXT        NOT NULL DEFAULT '',")
+    lines.append("    brand          TEXT,")
+    lines.append("    year           TEXT,")
+    lines.append("    plate          TEXT,")
+    lines.append("    platecode      TEXT,")
+    lines.append("    plateletter    TEXT,")
+    lines.append("    platenum       TEXT,")
+    lines.append("    licence_file   TEXT,")
+    lines.append("    idcard_file    TEXT,")
+    lines.append("    libre_file     TEXT,")
+    lines.append("    transport_type TEXT        NOT NULL DEFAULT 'motor',")
+    lines.append("    status         TEXT        NOT NULL DEFAULT 'pending',")
+    lines.append("    registered_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()")
+    lines.append(");")
+    lines.append("")
+
+    if not db:
+        lines.append("-- No records found.")
+        lines.append("")
+    else:
+        # ── INSERT rows ─────────────────────────────────────────────────
+        lines.append("-- ── Data ──────────────────────────────────────────────────")
+        lines.append("")
+
+        def sql_str(v):
+            """Escape a value as a SQL string literal, or NULL."""
+            if v is None or (isinstance(v, str) and v.strip() == ""):
+                return "NULL"
+            escaped = str(v).replace("'", "''")
+            return f"'{escaped}'"
+
+        cols = (
+            "id", "ref", "firstname", "lastname", "fullname", "phone",
+            "brand", "year", "plate", "platecode", "plateletter", "platenum",
+            "licence_file", "idcard_file", "libre_file",
+            "transport_type", "status", "registered_at",
+        )
+
+        lines.append(
+            "INSERT INTO bahiran_driver.registrations\n"
+            f"    ({', '.join(cols)})\nVALUES"
+        )
+
+        value_rows = []
+        for r in db:
+            vals = []
+            for c in cols:
+                v = r.get(c)
+                vals.append(sql_str(v))
+            value_rows.append("    (" + ", ".join(vals) + ")")
+
+        lines.append(",\n".join(value_rows) + ";")
+        lines.append("")
+
+    lines.append("-- ── End of backup ─────────────────────────────────────────")
+    lines.append("")
+
+    sql_text = "\n".join(lines)
+    date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    filename = f"bahiran-drivers-backup-{date_str}.sql"
+
+    return Response(
+        sql_text.encode("utf-8"),
+        mimetype="application/sql",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "application/octet-stream; charset=utf-8",
+        }
+    )
+
+
 # ── Start ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("=" * 60)
