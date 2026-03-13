@@ -150,8 +150,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .btn-sms-single:hover:not(:disabled){background:var(--purple);color:#fff;border-color:var(--purple);}
 .btn-delete{background:var(--red-bg);border:1px solid #fca5a5;color:var(--red);padding:6px 12px;}
 .btn-delete:hover:not(:disabled){background:var(--red);color:#fff;border-color:var(--red);}
-.btn-sql{background:#f5f3ff;border:1px solid #ddd6fe;color:#5b21b6;padding:6px 12px;}
-.btn-sql:hover{background:#5b21b6;color:#fff;border-color:#5b21b6;}
 
 /* Spinner inside button */
 .btn-spin{display:none;width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .5s linear infinite;flex-shrink:0;}
@@ -371,9 +369,6 @@ input[type=checkbox]{accent-color:var(--brand);width:14px;height:14px;cursor:poi
     </button>
     <button class="btn btn-delete" id="btn-delete-selected" onclick="deleteSelected()" disabled>
       <span class="btn-spin"></span><span class="btn-lbl">🗑 Delete selected</span>
-    </button>
-    <button class="btn btn-sql" onclick="downloadSQL()" title="Download full SQL backup (CREATE TABLE + INSERT)">
-      <span class="btn-lbl">🗄 Backup SQL</span>
     </button>
   </div>
 
@@ -951,12 +946,6 @@ function downloadSingle(ref){
 function downloadSelected(){
   const refs = getChecked().map(c=>c.ref);
   if(refs.length) downloadZip(refs, document.getElementById('btn-dl-selected'));
-}
-
-/* ── SQL Backup ──────────────────────────────────── */
-function downloadSQL(){
-  toast('Preparing SQL backup…');
-  window.location.href = '/admin/download-sql';
 }
 
 /* ── SMS ────────────────────────────────────────── */
