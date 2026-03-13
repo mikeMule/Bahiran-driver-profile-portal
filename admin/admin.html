@@ -150,6 +150,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .btn-sms-single:hover:not(:disabled){background:var(--purple);color:#fff;border-color:var(--purple);}
 .btn-delete{background:var(--red-bg);border:1px solid #fca5a5;color:var(--red);padding:6px 12px;}
 .btn-delete:hover:not(:disabled){background:var(--red);color:#fff;border-color:var(--red);}
+.btn-sql{background:#f5f3ff;border:1px solid #ddd6fe;color:#5b21b6;padding:6px 12px;}
+.btn-sql:hover{background:#5b21b6;color:#fff;border-color:#5b21b6;}
 
 /* Spinner inside button */
 .btn-spin{display:none;width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .5s linear infinite;flex-shrink:0;}
@@ -233,7 +235,7 @@ td .plate{font-family:var(--mono);font-size:11px;background:var(--surface2);bord
   z-index:500;align-items:center;justify-content:center;flex-direction:column;padding:20px;
 }
 #img-modal.open{display:flex;}
-#img-modal-inner{position:relative;display:flex;flex-direction:column;align-items:center;}
+#img-modal-inner{position:relative;display:flex;flex-direction:column;align-items:center;z-index:0;}
 #img-modal-img{
   max-width:88vw;max-height:78vh;border-radius:var(--r);display:block;
   object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,.7);transition:transform .2s;
@@ -246,15 +248,22 @@ td .plate{font-family:var(--mono);font-size:11px;background:var(--surface2);bord
   box-shadow:0 2px 10px rgba(0,0,0,.3);transition:all .15s;font-weight:700;
 }
 #img-modal-close:hover{background:#fee2e2;color:var(--red);}
-.img-modal-footer{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.img-modal-footer{
+  display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:14px;
+  position:relative;z-index:100;flex-shrink:0;
+  background:rgba(0,0,0,.9);padding:10px 14px;border-radius:var(--r);
+}
 #img-modal-label{color:rgba(255,255,255,.7);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.img-modal-nav{display:flex;align-items:center;gap:6px;}
 .zoom-btns{display:flex;gap:6px;}
-.zoom-btn{
+.zoom-btn, .img-nav-btn, .img-rotate-btn{
   background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
   color:#fff;padding:5px 14px;border-radius:var(--r);font-size:12px;
   cursor:pointer;transition:background .15s;font-family:var(--sans);
 }
-.zoom-btn:hover{background:rgba(255,255,255,.25);}
+.zoom-btn:hover, .img-nav-btn:hover, .img-rotate-btn:hover{background:rgba(255,255,255,.25);}
+.img-nav-btn:disabled, .img-rotate-btn:disabled{opacity:.4;cursor:not-allowed;}
+.img-nav-btn:disabled:hover, .img-rotate-btn:disabled:hover{background:rgba(255,255,255,.12);}
 
 /* ─────────────────── SMS MODAL ─────────────────── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center;}
@@ -363,6 +372,9 @@ input[type=checkbox]{accent-color:var(--brand);width:14px;height:14px;cursor:poi
     <button class="btn btn-delete" id="btn-delete-selected" onclick="deleteSelected()" disabled>
       <span class="btn-spin"></span><span class="btn-lbl">🗑 Delete selected</span>
     </button>
+    <button class="btn btn-sql" onclick="downloadSQL()" title="Download full SQL backup (CREATE TABLE + INSERT)">
+      <span class="btn-lbl">🗄 Backup SQL</span>
+    </button>
   </div>
 
   <div class="table-wrap">
@@ -390,6 +402,11 @@ input[type=checkbox]{accent-color:var(--brand);width:14px;height:14px;cursor:poi
   </div>
   <div class="img-modal-footer">
     <div id="img-modal-label"></div>
+    <div class="img-modal-nav" id="img-modal-nav">
+      <button type="button" class="img-nav-btn" id="img-prev-btn" onclick="imgModalPrev()" title="Previous">← Prev</button>
+      <button type="button" class="img-rotate-btn" id="img-rotate-btn" onclick="imgModalRotate()" title="Rotate 90°">↻ Rotate</button>
+      <button type="button" class="img-nav-btn" id="img-next-btn" onclick="imgModalNext()" title="Next">Next →</button>
+    </div>
     <div class="zoom-btns" id="zoom-btns">
       <button class="zoom-btn" onclick="changeZoom(-20)">− Out</button>
       <button class="zoom-btn" onclick="resetZoom()">↺ Reset</button>
@@ -466,7 +483,7 @@ function setBtnLoading(btn, loading){
 /* ── Doc thumbnails ─────────────────────────────── */
 function escapeAttr(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escapeJs(s){ return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"'); }
-function docThumbHtml(url, label, notRequiredLabel){
+function docThumbHtml(url, label, notRequiredLabel, slides, slideIndex){
   if(notRequiredLabel){
     return `<div class="doc-thumb-empty doc-thumb-not-required"><span style="font-size:18px">—</span><span>${escapeAttr(notRequiredLabel)}</span></div>`;
   }
@@ -479,7 +496,10 @@ function docThumbHtml(url, label, notRequiredLabel){
   const inner = pdf
     ? `<div class="thumb-pdf">📕</div>`
     : `<img class="thumb-img" src="${urlA}" alt="${labelA}" onerror="this.outerHTML='&lt;div class=thumb-err&gt;🖼&lt;/div&gt;'" loading="lazy" referrerpolicy="no-referrer" />`;
-  return `<div class="doc-thumb" onclick="openImgModal('${urlJ}','${labelJ}')" title="View ${labelA}">
+  const hasSlides = slides && slides.length && typeof slideIndex === 'number' && slideIndex >= 0;
+  const dataAttrs = hasSlides ? ` data-slides="${escapeAttr(JSON.stringify(slides))}" data-slide-index="${slideIndex}"` : '';
+  const onClick = hasSlides ? 'openImgModalFromThumb(this)' : `openImgModal('${urlJ}', '${labelJ}')`;
+  return `<div class="doc-thumb"${dataAttrs} onclick="${onClick}" title="View ${labelA}">
     ${inner}
     <div class="thumb-label">${labelA}</div>
   </div>`;
@@ -498,25 +518,94 @@ function actionBtns(ref, status){
 }
 
 /* ── Image / PDF zoom modal ─────────────────────── */
-function openImgModal(url, label){
+let imgModalSlides = [], imgModalIndex = 0, imgModalRotation = 0;
+
+function openImgModalFromThumb(thumbEl){
+  const d = thumbEl.dataset;
+  if(!d.slides || !d.slideIndex) return;
+  let slides;
+  try { slides = JSON.parse(d.slides); } catch(_) { return; }
+  const idx = parseInt(d.slideIndex, 10);
+  if(!Array.isArray(slides) || idx < 0 || idx >= slides.length) return;
+  openImgModal(slides, idx);
+}
+
+function openImgModal(urlOrSlides, labelOrIndex){
+  const slides = Array.isArray(urlOrSlides) ? urlOrSlides : [{ url: urlOrSlides, label: labelOrIndex }];
+  const index = typeof labelOrIndex === 'number' ? labelOrIndex : 0;
+  imgModalSlides = slides;
+  imgModalIndex = Math.max(0, Math.min(index, slides.length - 1));
+  imgModalRotation = 0;
   zoomLevel = 100;
-  const img  = document.getElementById('img-modal-img');
-  const pdf  = document.getElementById('img-modal-pdf');
-  const lbl  = document.getElementById('img-modal-label');
-  const zbts = document.getElementById('zoom-btns');
-  lbl.textContent = label;
-  if(isPdf(url)){
-    img.style.display = 'none'; img.src = '';
-    pdf.style.display = 'block'; pdf.src = url;
-    zbts.style.display = 'none';
-  } else {
-    pdf.style.display = 'none'; pdf.src = '';
-    img.style.display = 'block'; img.src = url;
-    img.style.transform = 'scale(1)';
-    zbts.style.display = 'flex';
-  }
+  showImgModalSlide();
   document.getElementById('img-modal').classList.add('open');
 }
+
+function showImgModalSlide(){
+  const img = document.getElementById('img-modal-img');
+  const pdf = document.getElementById('img-modal-pdf');
+  const lbl = document.getElementById('img-modal-label');
+  const zbts = document.getElementById('zoom-btns');
+  const nav = document.getElementById('img-modal-nav');
+  const prevBtn = document.getElementById('img-prev-btn');
+  const nextBtn = document.getElementById('img-next-btn');
+  const rotBtn = document.getElementById('img-rotate-btn');
+
+  if(!imgModalSlides.length){ closeImgModal(null, true); return; }
+  const s = imgModalSlides[imgModalIndex];
+  const url = s.url, label = s.label;
+  lbl.textContent = (imgModalSlides.length > 1 ? (imgModalIndex + 1) + ' / ' + imgModalSlides.length + ' — ' : '') + label;
+
+  if(prevBtn) prevBtn.disabled = imgModalIndex <= 0;
+  if(nextBtn) nextBtn.disabled = imgModalIndex >= imgModalSlides.length - 1;
+  if(nav) nav.style.display = imgModalSlides.length > 1 ? 'flex' : 'none';
+
+  if(isPdf(url)){
+    img.style.display = 'none'; img.src = '';
+    img.style.transform = '';
+    pdf.style.display = 'block'; pdf.src = url;
+    zbts.style.display = 'none';
+    if(rotBtn) rotBtn.disabled = true;
+  } else {
+    pdf.style.display = 'none'; pdf.src = '';
+    img.style.display = 'block';
+    img.src = url;
+    applyImgModalTransform();
+    zbts.style.display = 'flex';
+    if(rotBtn) rotBtn.disabled = false;
+  }
+}
+
+function applyImgModalTransform(){
+  const img = document.getElementById('img-modal-img');
+  if(!img || !img.style) return;
+  const scale = zoomLevel / 100;
+  img.style.transform = `scale(${scale}) rotate(${imgModalRotation}deg)`;
+}
+
+function imgModalPrev(){
+  if(imgModalIndex <= 0) return;
+  imgModalIndex--;
+  imgModalRotation = 0;
+  zoomLevel = 100;
+  showImgModalSlide();
+}
+
+function imgModalNext(){
+  if(imgModalIndex >= imgModalSlides.length - 1) return;
+  imgModalIndex++;
+  imgModalRotation = 0;
+  zoomLevel = 100;
+  showImgModalSlide();
+}
+
+function imgModalRotate(){
+  const img = document.getElementById('img-modal-img');
+  if(!img || img.style.display === 'none') return;
+  imgModalRotation = (imgModalRotation + 90) % 360;
+  applyImgModalTransform();
+}
+
 function closeImgModal(e, force){
   if(force || !e || e.target === document.getElementById('img-modal')){
     document.getElementById('img-modal').classList.remove('open');
@@ -528,13 +617,20 @@ function closeImgModal(e, force){
 }
 function changeZoom(delta){
   zoomLevel = Math.min(300, Math.max(25, zoomLevel + delta));
-  document.getElementById('img-modal-img').style.transform = `scale(${zoomLevel/100})`;
+  applyImgModalTransform();
 }
 function resetZoom(){
   zoomLevel = 100;
-  document.getElementById('img-modal-img').style.transform = 'scale(1)';
+  imgModalRotation = 0;
+  applyImgModalTransform();
 }
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeImgModal(null,true); });
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeImgModal(null, true);
+  if(document.getElementById('img-modal').classList.contains('open')){
+    if(e.key === 'ArrowLeft'){ imgModalPrev(); e.preventDefault(); }
+    if(e.key === 'ArrowRight'){ imgModalNext(); e.preventDefault(); }
+  }
+});
 
 /* ── Auth ───────────────────────────────────────── */
 async function doLogin(){
@@ -676,7 +772,15 @@ function renderTable(){
           <div class="acc-section">
             <h4 class="acc-doc-title">Documents <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted2)">— tap to view</span></h4>
             <div class="doc-thumbs">
-              ${isBike ? docThumbHtml(null,'Licence','Not required (Bicycles)') + docThumbHtml(idUrl,'ID Card',null) + docThumbHtml(null,'Libre','Not required (Bicycles)') : docThumbHtml(licUrl,'Licence',null) + docThumbHtml(idUrl,'ID Card',null) + docThumbHtml(libUrl,'Libre',null)}
+              ${(function(){
+                const slides = [];
+                if(!isBike && licUrl) slides.push({url:licUrl,label:'Licence'});
+                if(idUrl) slides.push({url:idUrl,label:'ID Card'});
+                if(!isBike && libUrl) slides.push({url:libUrl,label:'Libre'});
+                let idx = 0;
+                if(isBike) return docThumbHtml(null,'Licence','Not required (Bicycles)') + docThumbHtml(idUrl,'ID Card',null,slides,idUrl?idx++:-1) + docThumbHtml(null,'Libre','Not required (Bicycles)');
+                return docThumbHtml(licUrl,'Licence',null,slides,licUrl?idx++:-1) + docThumbHtml(idUrl,'ID Card',null,slides,idUrl?idx++:-1) + docThumbHtml(libUrl,'Libre',null,slides,libUrl?idx++:-1);
+              })()}
             </div>
           </div>
 
@@ -847,6 +951,12 @@ function downloadSingle(ref){
 function downloadSelected(){
   const refs = getChecked().map(c=>c.ref);
   if(refs.length) downloadZip(refs, document.getElementById('btn-dl-selected'));
+}
+
+/* ── SQL Backup ──────────────────────────────────── */
+function downloadSQL(){
+  toast('Preparing SQL backup…');
+  window.location.href = '/admin/download-sql';
 }
 
 /* ── SMS ────────────────────────────────────────── */
