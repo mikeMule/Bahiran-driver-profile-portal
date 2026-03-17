@@ -65,7 +65,14 @@ SUPABASE_DATABASE_POOLER_URL = os.environ.get("SUPABASE_DATABASE_POOLER_URL")
 # Supabase Storage — bucket name for driver document uploads
 SUPABASE_STORAGE_BUCKET = os.environ.get("SUPABASE_STORAGE_BUCKET", "driver-documents").strip()
 
-# No local uploads — files go to Supabase Storage only
+# Optional override for the storage base URL (e.g. http://72.60.30.150:8000).
+# Use this when SUPABASE_URL resolves to a hostname that is unreachable from the
+# API server (e.g. an internal Docker/sslip.io URL). Falls back to SUPABASE_URL.
+SUPABASE_STORAGE_BASE_URL = (
+    os.environ.get("SUPABASE_STORAGE_URL")
+    or os.environ.get("SUPABASE_STORAGE_BASE_URL")
+    or SUPABASE_URL
+)
 
 # ── App setup ────────────────────────────────────────────────────────────
 app = Flask(__name__, static_folder=None)  # we serve index manually
@@ -113,7 +120,8 @@ def upload_file_to_supabase(file_obj, storage_path):
     try:
         import requests as req_lib
         file_bytes = file_obj.read()
-        url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
+        base = (SUPABASE_STORAGE_BASE_URL or SUPABASE_URL or "").rstrip("/")
+        url = f"{base}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
         headers = {
             "Authorization": f"Bearer {auth_key}",
             "Content-Type": mime,
@@ -152,12 +160,14 @@ def upload_file_to_supabase(file_obj, storage_path):
 
 def get_file_from_storage(storage_path):
     """Download file from Supabase Storage. Returns (bytes, content_type) or (None, None)."""
-    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
+    auth_key = SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY
+    if not (SUPABASE_URL and auth_key):
         return (None, None)
     try:
         import requests as req_lib
-        url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
-        headers = {"Authorization": f"Bearer {SUPABASE_ANON_KEY}"}
+        base = (SUPABASE_STORAGE_BASE_URL or SUPABASE_URL or "").rstrip("/")
+        url = f"{base}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
+        headers = {"Authorization": f"Bearer {auth_key}"}
         resp = req_lib.get(url, headers=headers, timeout=30)
         if resp.status_code == 200:
             content_type = resp.headers.get("Content-Type", "application/octet-stream")
