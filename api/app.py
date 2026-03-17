@@ -25,6 +25,8 @@ import uuid
 import random
 import string
 import traceback
+import datetime
+import jwt
 from datetime import datetime, timedelta
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -1259,6 +1261,150 @@ def admin_serve_file(storage_path):
 
 
 # ── Start ────────────────────────────────────────────────────────────────
+
+# ── API Routes for Restaurant Registration ──────────────────────────────
+
+@app.route("/api/v1/users/signup", methods=["POST"])
+def api_users_signup():
+    """Send OTP for phone signup."""
+    try:
+        data = request.get_json()
+        phone = data.get("phone", "").strip()
+
+        if not phone.startswith("+") or len(phone) < 10:
+            return jsonify({"message": "Invalid phone number format"}), 400
+
+        # Here you would integrate with your SMS service to send OTP
+        # For now, we'll just return success
+        return jsonify({
+            "message": "OTP sent successfully",
+            "phone": phone
+        }), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+
+@app.route("/api/v1/users/verifySignupOTP", methods=["POST"])
+def api_users_verify_otp():
+    """Verify OTP and return token."""
+    try:
+        data = request.get_json()
+        phone = data.get("phone", "").strip()
+        code = data.get("code", "").strip()
+        password = data.get("password", "").strip()
+        password_confirm = data.get("passwordConfirm", "").strip()
+
+        if not phone or not code or len(code) != 6:
+            return jsonify({"message": "Invalid phone or OTP code"}), 400
+
+        if password != password_confirm:
+            return jsonify({"message": "Passwords do not match"}), 400
+
+        # Here you would verify the OTP with your SMS service
+        # For now, we'll accept any 6-digit code and return a mock token
+        if not code.isdigit() or len(code) != 6:
+            return jsonify({"message": "Invalid OTP code"}), 400
+
+        # Generate a mock JWT token
+        import jwt
+        import datetime
+        token_payload = {
+            "phone": phone,
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        }
+        token = jwt.encode(token_payload, "your-secret-key", algorithm="HS256")
+
+        return jsonify({
+            "message": "OTP verified successfully",
+            "token": token
+        }), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+
+@app.route("/api/v1/restaurant-applications/register", methods=["POST"])
+def api_restaurant_register():
+    """Register restaurant with token authentication."""
+    try:
+        # Check for authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"message": "Authorization token required"}), 401
+
+        token = auth_header.split(" ")[1]
+
+        # Here you would verify the JWT token
+        # For now, we'll accept any token
+        try:
+            import jwt
+            decoded = jwt.decode(token, "your-secret-key", algorithms=["HS256"])
+            phone = decoded.get("phone")
+        except:
+            return jsonify({"message": "Invalid token"}), 401
+
+        # Get form data
+        first_name = request.form.get("firstName", "").strip()
+        last_name = request.form.get("lastName", "").strip()
+        restaurant_name = request.form.get("restaurantName", "").strip()
+        restaurant_address = request.form.get("restaurantAddress", "").strip()
+        fcn = request.form.get("fcn", "").strip()
+        tin_number = request.form.get("tinNumber", "").strip()
+        menu_type = request.form.get("menuType", "text")
+
+        # Validate required fields
+        if not all([first_name, last_name, restaurant_name, restaurant_address, fcn, tin_number]):
+            return jsonify({"message": "All fields are required"}), 400
+
+        # Handle menu data
+        menu_data = None
+        if menu_type == "text":
+            menu_data = request.form.get("menuText", "").strip()
+        elif menu_type == "image":
+            menu_file = request.files.get("menuImage")
+            if menu_file:
+                # Here you would save the file and store the path
+                menu_data = f"image:{menu_file.filename}"
+        elif menu_type == "file":
+            menu_file = request.files.get("menuFile")
+            if menu_file:
+                # Here you would save the file and store the path
+                menu_data = f"file:{menu_file.filename}"
+
+        # Handle license file
+        license_file = request.files.get("license")
+        license_path = None
+        if license_file:
+            # Here you would save the file and store the path
+            license_path = f"license:{license_file.filename}"
+
+        # Here you would save to database
+        # For now, we'll just return success
+        registration_data = {
+            "firstName": first_name,
+            "lastName": last_name,
+            "phone": phone,
+            "restaurantName": restaurant_name,
+            "restaurantAddress": restaurant_address,
+            "fcn": fcn,
+            "tinNumber": tin_number,
+            "menuType": menu_type,
+            "menuData": menu_data,
+            "license": license_path,
+            "status": "pending",
+            "registeredAt": datetime.datetime.utcnow().isoformat()
+        }
+
+        return jsonify({
+            "message": "Restaurant registration successful",
+            "data": registration_data
+        }), 201
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+
 if __name__ == "__main__":
     print("=" * 60)
     print("  Bahiran Delivery Driver Registration - Registration Server")
