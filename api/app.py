@@ -1267,6 +1267,20 @@ def admin_serve_file(storage_path):
 
 # ── Start ────────────────────────────────────────────────────────────────
 
+@app.route("/api/health", methods=["GET"])
+def api_health():
+    """Return storage and DB config status (no secrets). Use to verify env vars in deployment."""
+    return jsonify({
+        "ok": True,
+        "storage": {
+            "configured": bool(SUPABASE_URL and SUPABASE_ANON_KEY),
+            "bucket": SUPABASE_STORAGE_BUCKET,
+            "url_set": bool(SUPABASE_URL),
+            "key_set": bool(SUPABASE_ANON_KEY),
+        },
+        "database_configured": bool(SUPABASE_DATABASE_URL or SUPABASE_DATABASE_POOLER_URL),
+    })
+
 # ── API Routes for Restaurant Registration ──────────────────────────────
 
 @app.route("/api/v1/users/signup", methods=["POST"])
