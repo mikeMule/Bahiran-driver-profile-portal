@@ -92,8 +92,11 @@ def upload_file_to_supabase(file_obj, storage_path):
     """Upload a file to Supabase Storage. Returns 'storage:PATH' or None.
     storage_path example: 'REF-ABC12345/licence.jpg'
     Files are stored under: driver-documents/REF-ABC12345/licence.jpg
+    Uses service role key when set (bypasses RLS so server uploads always succeed).
     """
-    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
+    # Prefer service role key for uploads so RLS does not block server-side uploads
+    storage_key = SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY
+    if not (SUPABASE_URL and storage_key):
         return None
     if not file_obj or not file_obj.filename:
         return None
@@ -112,7 +115,8 @@ def upload_file_to_supabase(file_obj, storage_path):
         file_bytes = file_obj.read()
         url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
         headers = {
-            "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+            "Authorization": f"Bearer {storage_key}",
+            "apikey": storage_key,
             "Content-Type": mime,
             "x-upsert": "true",
         }
@@ -124,9 +128,13 @@ def upload_file_to_supabase(file_obj, storage_path):
             print(f"[Storage] Uploaded: {storage_path}")
             return f"storage:{storage_path}"
         else:
-            err_body = (resp.text or "")[:500]
-            print(f"[Storage] Upload failed ({resp.status_code}) path={storage_path} bucket={SUPABASE_STORAGE_BUCKET} url_set={bool(SUPABASE_URL)} key_set={bool(SUPABASE_ANON_KEY)}")
+            err_body = (resp.text or "").strip()[:500]
+            print(f"[Storage] Upload failed ({resp.status_code}) path={storage_path} bucket={SUPABASE_STORAGE_BUCKET}")
             print(f"[Storage] Response: {err_body}")
+            if resp.status_code == 403:
+                print("[Storage] Hint: Use SUPABASE_SERVICE_ROLE_KEY for uploads, or add a Storage policy allowing INSERT on bucket.")
+            elif resp.status_code in (404, 400):
+                print("[Storage] Hint: Ensure bucket exists in Supabase Dashboard → Storage and name matches SUPABASE_STORAGE_BUCKET.")
             file_obj.seek(0)
             return None
     except Exception as e:
@@ -148,12 +156,13 @@ def upload_file_to_supabase(file_obj, storage_path):
 
 def get_file_from_storage(storage_path):
     """Download file from Supabase Storage. Returns (bytes, content_type) or (None, None)."""
-    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
+    storage_key = SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY
+    if not (SUPABASE_URL and storage_key):
         return (None, None)
     try:
         import requests as req_lib
         url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
-        headers = {"Authorization": f"Bearer {SUPABASE_ANON_KEY}"}
+        headers = {"Authorization": f"Bearer {storage_key}", "apikey": storage_key}
         resp = req_lib.get(url, headers=headers, timeout=30)
         if resp.status_code == 200:
             content_type = resp.headers.get("Content-Type", "application/octet-stream")
@@ -735,11 +744,11 @@ def register():
         subfolder = reg_id
 
         # Use REF as folder name in Supabase Storage: REF-XXXXX/uuid.ext
-        _storage_ok = bool(SUPABASE_URL and SUPABASE_ANON_KEY)
+        _storage_ok = bool(SUPABASE_URL and (SUPABASE_ANON_KEY or SUPABASE_SERVICE_KEY))
         if not _storage_ok:
             return jsonify({
                 "success": False,
-                "message": "File storage is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_KEY) in Environment Variables and ensure the storage bucket exists."
+                "message": "File storage is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY) and ensure the storage bucket exists."
             }), 500
         idcard_path = save_file(idcard_file, subfolder, ref_folder=ref)
         if is_bike:
@@ -751,8 +760,8 @@ def register():
 
         # All required files must have saved successfully
         if not idcard_path:
-            _help = "Set SUPABASE_URL, SUPABASE_ANON_KEY (or SUPABASE_KEY), SUPABASE_STORAGE_BUCKET in env; create bucket and allow anon uploads. See logs for API error."
-            print(f"[Storage] ID card save failed. {_help} SUPABASE_URL set={bool(SUPABASE_URL)} key set={bool(SUPABASE_ANON_KEY)} bucket={SUPABASE_STORAGE_BUCKET}")
+            _help = "Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (recommended) or SUPABASE_ANON_KEY, SUPABASE_STORAGE_BUCKET; create bucket in Dashboard. See [Storage] logs for API error."
+            print(f"[Storage] ID card save failed. {_help} SUPABASE_URL set={bool(SUPABASE_URL)} key set={bool(SUPABASE_ANON_KEY or SUPABASE_SERVICE_KEY)} bucket={SUPABASE_STORAGE_BUCKET}")
             return jsonify({
                 "success": False,
                 "message": "Unable to save ID card. Please try again or contact support."
