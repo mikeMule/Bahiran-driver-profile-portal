@@ -92,8 +92,11 @@ def upload_file_to_supabase(file_obj, storage_path):
     """Upload a file to Supabase Storage. Returns 'storage:PATH' or None.
     storage_path example: 'REF-ABC12345/licence.jpg'
     Files are stored under: driver-documents/REF-ABC12345/licence.jpg
+    Uses service role key when available (bypasses RLS); falls back to anon key.
     """
-    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
+    auth_key = SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY
+    if not (SUPABASE_URL and auth_key):
+        print(f"[Storage] Missing SUPABASE_URL or auth key — cannot upload {storage_path}")
         return None
     if not file_obj or not file_obj.filename:
         return None
@@ -112,10 +115,11 @@ def upload_file_to_supabase(file_obj, storage_path):
         file_bytes = file_obj.read()
         url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
         headers = {
-            "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+            "Authorization": f"Bearer {auth_key}",
             "Content-Type": mime,
             "x-upsert": "true",
         }
+        print(f"[Storage] Uploading to {url} (key_type={'service' if SUPABASE_SERVICE_KEY else 'anon'})")
         resp = req_lib.post(
             url, headers=headers, data=file_bytes,
             timeout=(STORAGE_CONNECT_TIMEOUT, STORAGE_READ_TIMEOUT),
@@ -124,16 +128,19 @@ def upload_file_to_supabase(file_obj, storage_path):
             print(f"[Storage] Uploaded: {storage_path}")
             return f"storage:{storage_path}"
         else:
-            print(f"[Storage] Upload failed ({resp.status_code}): {(resp.text or '')[:200]}")
-            file_obj.seek(0)
+            print(f"[Storage] Upload failed ({resp.status_code}): {(resp.text or '')[:400]}")
+            try:
+                file_obj.seek(0)
+            except Exception:
+                pass
             return None
     except Exception as e:
         try:
             import requests as _req
             if isinstance(e, (_req.exceptions.Timeout, _req.exceptions.ConnectionError)):
-                print(f"[Storage] Upload timed out or connection failed for {storage_path}; using local save.")
+                print(f"[Storage] Upload timed out or connection failed for {storage_path}: {e}")
             else:
-                raise
+                traceback.print_exc()
         except Exception:
             traceback.print_exc()
         try:
@@ -459,7 +466,11 @@ def insert_registration(record):
     """
     # Prefer direct Postgres when configured (avoids PGRST002 on self-hosted Supabase)
     if SUPABASE_DATABASE_URL:
-        conn, conn_err = get_db_connection()
+        try:
+            conn, conn_err = get_db_connection()
+        except Exception as _e:
+            traceback.print_exc()
+            conn, conn_err = None, str(_e)
         if conn is None:
             err = (conn_err or "Could not connect to database.").strip()
             if len(err) > 300:
@@ -536,7 +547,11 @@ def _api_row_to_registration(row):
 def load_db_registrations():
     """Return list of registrations from PostgreSQL (preferred) or Supabase API, or None if not configured/fails."""
     if SUPABASE_DATABASE_URL:
-        conn, _ = get_db_connection()
+        try:
+            conn, _ = get_db_connection()
+        except Exception:
+            traceback.print_exc()
+            conn = None
         if conn is not None:
             try:
                 with conn.cursor() as cur:
@@ -578,7 +593,11 @@ def load_db_registrations():
 def get_registration_by_ref(ref):
     """Return one registration dict by ref or id from PostgreSQL (preferred) or Supabase API, or None."""
     if SUPABASE_DATABASE_URL:
-        conn, _ = get_db_connection()
+        try:
+            conn, _ = get_db_connection()
+        except Exception:
+            traceback.print_exc()
+            conn = None
         if conn is not None:
             try:
                 with conn.cursor() as cur:
