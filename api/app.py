@@ -92,11 +92,8 @@ def upload_file_to_supabase(file_obj, storage_path):
     """Upload a file to Supabase Storage. Returns 'storage:PATH' or None.
     storage_path example: 'REF-ABC12345/licence.jpg'
     Files are stored under: driver-documents/REF-ABC12345/licence.jpg
-    Uses service role key when set (bypasses RLS so server uploads always succeed).
     """
-    # Prefer service role key for uploads so RLS does not block server-side uploads
-    storage_key = SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY
-    if not (SUPABASE_URL and storage_key):
+    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
         return None
     if not file_obj or not file_obj.filename:
         return None
@@ -115,8 +112,7 @@ def upload_file_to_supabase(file_obj, storage_path):
         file_bytes = file_obj.read()
         url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
         headers = {
-            "Authorization": f"Bearer {storage_key}",
-            "apikey": storage_key,
+            "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
             "Content-Type": mime,
             "x-upsert": "true",
         }
@@ -128,21 +124,14 @@ def upload_file_to_supabase(file_obj, storage_path):
             print(f"[Storage] Uploaded: {storage_path}")
             return f"storage:{storage_path}"
         else:
-            err_body = (resp.text or "").strip()[:500]
-            print(f"[Storage] Upload failed ({resp.status_code}) path={storage_path} bucket={SUPABASE_STORAGE_BUCKET}")
-            print(f"[Storage] Response: {err_body}")
-            if resp.status_code == 403:
-                print("[Storage] Hint: Use SUPABASE_SERVICE_ROLE_KEY for uploads, or add a Storage policy allowing INSERT on bucket.")
-            elif resp.status_code in (404, 400):
-                print("[Storage] Hint: Ensure bucket exists in Supabase Dashboard → Storage and name matches SUPABASE_STORAGE_BUCKET.")
+            print(f"[Storage] Upload failed ({resp.status_code}): {(resp.text or '')[:200]}")
             file_obj.seek(0)
             return None
     except Exception as e:
-        # Timeout: log once and fall back to local save (no full traceback)
         try:
             import requests as _req
             if isinstance(e, (_req.exceptions.Timeout, _req.exceptions.ConnectionError)):
-                print(f"[Storage] Upload timed out or connection failed for {storage_path}; caller may fall back to local save.")
+                print(f"[Storage] Upload timed out or connection failed for {storage_path}; using local save.")
             else:
                 raise
         except Exception:
@@ -156,13 +145,12 @@ def upload_file_to_supabase(file_obj, storage_path):
 
 def get_file_from_storage(storage_path):
     """Download file from Supabase Storage. Returns (bytes, content_type) or (None, None)."""
-    storage_key = SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY
-    if not (SUPABASE_URL and storage_key):
+    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
         return (None, None)
     try:
         import requests as req_lib
         url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{storage_path}"
-        headers = {"Authorization": f"Bearer {storage_key}", "apikey": storage_key}
+        headers = {"Authorization": f"Bearer {SUPABASE_ANON_KEY}"}
         resp = req_lib.get(url, headers=headers, timeout=30)
         if resp.status_code == 200:
             content_type = resp.headers.get("Content-Type", "application/octet-stream")
@@ -174,7 +162,7 @@ def get_file_from_storage(storage_path):
 
 
 def _save_file_local(file_obj, folder, name):
-    """Save file to UPLOAD_DIR/folder/name. Returns 'uploads/folder/name' or None."""
+    """Save file to UPLOAD_DIR/folder/name. Returns 'uploads/folder/name' or None. (Used only for admin/legacy.)"""
     try:
         dest_dir = os.path.join(UPLOAD_DIR, folder)
         os.makedirs(dest_dir, exist_ok=True)
@@ -189,8 +177,8 @@ def _save_file_local(file_obj, folder, name):
 
 
 def save_file(file_obj, subfolder, ref_folder=None):
-    """Save file to Supabase Storage; on timeout/connection failure fall back to local disk.
-    Returns 'storage:PATH', 'uploads/folder/name', or None on failure.
+    """Save file to Supabase Storage only. No local uploads — everything goes to DB/Storage.
+    ref_folder is the REF folder name used in storage path. Returns 'storage:PATH' or None on failure.
     """
     if not file_obj or not file_obj.filename or not allowed_file(file_obj.filename):
         return None
@@ -199,21 +187,10 @@ def save_file(file_obj, subfolder, ref_folder=None):
     folder = ref_folder if ref_folder else subfolder
     storage_path = f"{folder}/{name}"
 
-    if SUPABASE_URL and SUPABASE_ANON_KEY:
-        result = upload_file_to_supabase(file_obj, storage_path)
-        if result:
-            return result
-        # Timeout or connection failed — fall back to local save so registration can succeed
-        local_path = _save_file_local(file_obj, folder, name)
-        if local_path:
-            print(f"[Storage] Saved locally (Supabase unreachable): {local_path}")
-            return local_path
-    else:
-        # No Supabase config — try local only
-        local_path = _save_file_local(file_obj, folder, name)
-        if local_path:
-            return local_path
-    return None
+    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
+        return None
+    result = upload_file_to_supabase(file_obj, storage_path)
+    return result
 
 
 def load_db():
@@ -744,11 +721,11 @@ def register():
         subfolder = reg_id
 
         # Use REF as folder name in Supabase Storage: REF-XXXXX/uuid.ext
-        _storage_ok = bool(SUPABASE_URL and (SUPABASE_ANON_KEY or SUPABASE_SERVICE_KEY))
+        _storage_ok = bool(SUPABASE_URL and SUPABASE_ANON_KEY)
         if not _storage_ok:
             return jsonify({
                 "success": False,
-                "message": "File storage is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY) and ensure the storage bucket exists."
+                "message": "File storage is not configured. Set SUPABASE_URL and SUPABASE_KEY in .env and ensure the storage bucket exists."
             }), 500
         idcard_path = save_file(idcard_file, subfolder, ref_folder=ref)
         if is_bike:
@@ -760,17 +737,14 @@ def register():
 
         # All required files must have saved successfully
         if not idcard_path:
-            _help = "Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (recommended) or SUPABASE_ANON_KEY, SUPABASE_STORAGE_BUCKET; create bucket in Dashboard. See [Storage] logs for API error."
-            print(f"[Storage] ID card save failed. {_help} SUPABASE_URL set={bool(SUPABASE_URL)} key set={bool(SUPABASE_ANON_KEY or SUPABASE_SERVICE_KEY)} bucket={SUPABASE_STORAGE_BUCKET}")
             return jsonify({
                 "success": False,
-                "message": "Unable to save ID card. Please try again or contact support."
+                "message": "Failed to save ID card file. Check server logs for details (e.g. storage URL, auth, or bucket name)."
             }), 500
         if not is_bike and not all([licence_path, libre_path]):
-            print(f"[Storage] One or more file uploads failed. Check [Storage] log lines above for status code and response.")
             return jsonify({
                 "success": False,
-                "message": "Unable to save one or more documents. Please try again or contact support."
+                "message": "Failed to save one or more uploaded files. Check server logs for storage errors."
             }), 500
 
         if is_bike:
