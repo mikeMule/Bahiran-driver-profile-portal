@@ -134,7 +134,7 @@ def upload_file_to_supabase(file_obj, storage_path):
         try:
             import requests as _req
             if isinstance(e, (_req.exceptions.Timeout, _req.exceptions.ConnectionError)):
-                print(f"[Storage] Upload timed out or connection failed for {storage_path}; using local save.")
+                print(f"[Storage] Upload timed out or connection failed for {storage_path}; caller may fall back to local save.")
             else:
                 raise
         except Exception:
@@ -164,9 +164,24 @@ def get_file_from_storage(storage_path):
         return (None, None)
 
 
+def _save_file_local(file_obj, folder, name):
+    """Save file to UPLOAD_DIR/folder/name. Returns 'uploads/folder/name' or None."""
+    try:
+        dest_dir = os.path.join(UPLOAD_DIR, folder)
+        os.makedirs(dest_dir, exist_ok=True)
+        dest_path = os.path.join(dest_dir, name)
+        file_obj.seek(0)
+        file_obj.save(dest_path)
+        return f"uploads/{folder}/{name}"
+    except Exception as e:
+        print(f"[Storage] Local save failed for {folder}/{name}: {e}")
+        traceback.print_exc()
+        return None
+
+
 def save_file(file_obj, subfolder, ref_folder=None):
-    """Save file to Supabase Storage only. No local uploads — everything goes to DB/Storage.
-    ref_folder is the REF folder name used in storage path. Returns 'storage:PATH' or None on failure.
+    """Save file to Supabase Storage; on timeout/connection failure fall back to local disk.
+    Returns 'storage:PATH', 'uploads/folder/name', or None on failure.
     """
     if not file_obj or not file_obj.filename or not allowed_file(file_obj.filename):
         return None
@@ -175,10 +190,21 @@ def save_file(file_obj, subfolder, ref_folder=None):
     folder = ref_folder if ref_folder else subfolder
     storage_path = f"{folder}/{name}"
 
-    if not (SUPABASE_URL and SUPABASE_ANON_KEY):
-        return None
-    result = upload_file_to_supabase(file_obj, storage_path)
-    return result
+    if SUPABASE_URL and SUPABASE_ANON_KEY:
+        result = upload_file_to_supabase(file_obj, storage_path)
+        if result:
+            return result
+        # Timeout or connection failed — fall back to local save so registration can succeed
+        local_path = _save_file_local(file_obj, folder, name)
+        if local_path:
+            print(f"[Storage] Saved locally (Supabase unreachable): {local_path}")
+            return local_path
+    else:
+        # No Supabase config — try local only
+        local_path = _save_file_local(file_obj, folder, name)
+        if local_path:
+            return local_path
+    return None
 
 
 def load_db():
