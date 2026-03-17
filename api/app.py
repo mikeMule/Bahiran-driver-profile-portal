@@ -124,7 +124,9 @@ def upload_file_to_supabase(file_obj, storage_path):
             print(f"[Storage] Uploaded: {storage_path}")
             return f"storage:{storage_path}"
         else:
-            print(f"[Storage] Upload failed ({resp.status_code}): {resp.text[:200]}")
+            err_body = (resp.text or "")[:500]
+            print(f"[Storage] Upload failed ({resp.status_code}) path={storage_path} bucket={SUPABASE_STORAGE_BUCKET} url_set={bool(SUPABASE_URL)} key_set={bool(SUPABASE_ANON_KEY)}")
+            print(f"[Storage] Response: {err_body}")
             file_obj.seek(0)
             return None
     except Exception as e:
@@ -711,7 +713,7 @@ def register():
         if not _storage_ok:
             return jsonify({
                 "success": False,
-                "message": "File storage is not configured. Set SUPABASE_URL and SUPABASE_KEY in .env and ensure the storage bucket exists."
+                "message": "File storage is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_KEY) in Environment Variables and ensure the storage bucket exists."
             }), 500
         idcard_path = save_file(idcard_file, subfolder, ref_folder=ref)
         if is_bike:
@@ -723,9 +725,10 @@ def register():
 
         # All required files must have saved successfully
         if not idcard_path:
+            print(f"[Storage] ID card save failed. SUPABASE_URL set={bool(SUPABASE_URL)} SUPABASE_ANON_KEY set={bool(SUPABASE_ANON_KEY)} bucket={SUPABASE_STORAGE_BUCKET}")
             return jsonify({
                 "success": False,
-                "message": "Failed to save ID card file. Check server logs for details (e.g. storage URL, auth, or bucket name)."
+                "message": "Failed to save ID card file. In deployment (e.g. Coolify) set Environment Variables: SUPABASE_URL, SUPABASE_ANON_KEY (or SUPABASE_KEY), and optionally SUPABASE_STORAGE_BUCKET (default: driver-documents). In Supabase Dashboard create the bucket and allow uploads (e.g. policy for anon). Check server logs for the exact API error."
             }), 500
         if not is_bike and not all([licence_path, libre_path]):
             return jsonify({
