@@ -725,15 +725,17 @@ def register():
 
         # All required files must have saved successfully
         if not idcard_path:
-            print(f"[Storage] ID card save failed. SUPABASE_URL set={bool(SUPABASE_URL)} SUPABASE_ANON_KEY set={bool(SUPABASE_ANON_KEY)} bucket={SUPABASE_STORAGE_BUCKET}")
+            _help = "Set SUPABASE_URL, SUPABASE_ANON_KEY (or SUPABASE_KEY), SUPABASE_STORAGE_BUCKET in env; create bucket and allow anon uploads. See logs for API error."
+            print(f"[Storage] ID card save failed. {_help} SUPABASE_URL set={bool(SUPABASE_URL)} key set={bool(SUPABASE_ANON_KEY)} bucket={SUPABASE_STORAGE_BUCKET}")
             return jsonify({
                 "success": False,
-                "message": "Failed to save ID card file. In deployment (e.g. Coolify) set Environment Variables: SUPABASE_URL, SUPABASE_ANON_KEY (or SUPABASE_KEY), and optionally SUPABASE_STORAGE_BUCKET (default: driver-documents). In Supabase Dashboard create the bucket and allow uploads (e.g. policy for anon). Check server logs for the exact API error."
+                "message": "Unable to save ID card. Please try again or contact support."
             }), 500
         if not is_bike and not all([licence_path, libre_path]):
+            print(f"[Storage] One or more file uploads failed. Check [Storage] log lines above for status code and response.")
             return jsonify({
                 "success": False,
-                "message": "Failed to save one or more uploaded files. Check server logs for storage errors."
+                "message": "Unable to save one or more documents. Please try again or contact support."
             }), 500
 
         if is_bike:
